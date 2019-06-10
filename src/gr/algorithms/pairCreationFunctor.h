@@ -12,14 +12,14 @@
 
 namespace gr {
 
-template <typename _Scalar, typename FilterFunctor, typename Options>
+template <typename PointType, typename _Scalar, typename FilterFunctor, typename Options>
 struct PairCreationFunctor{
 
 public:
   using Scalar      = _Scalar;
   using PairsVector = std::vector<std::pair<int, int>>;
-  using VectorType  = typename Point3D::VectorType;
-  using BaseCoordinates = Traits4pcs::Coordinates;
+  using VectorType  = typename PointType::VectorType;
+  using BaseCoordinates = typename Traits4pcs<PointType>::Coordinates;
   using OptionType  = Options;
 
   // Shared data
@@ -27,7 +27,7 @@ public:
   double pair_distance;
   double pair_normals_angle;
   double pair_distance_epsilon;
-  const std::vector<Point3D>& Q_;
+  const std::vector<PointType>& Q_;
 
   PairsVector* pairs;
 
@@ -54,7 +54,7 @@ private:
 public:
   inline PairCreationFunctor(
     const OptionType& options,
-    const std::vector<Point3D>& Q)
+    const std::vector<PointType>& Q)
     :options_(options), Q_(Q),
      pairs(NULL), _ratio(1.f)
     { }
@@ -147,8 +147,8 @@ public:
 
   inline void process(int i, int j){
     if (i>j){
-      const Point3D& p = Q_[j];
-      const Point3D& q = Q_[i];
+      const PointType& p = Q_[j];
+      const PointType& q = Q_[i];
 
       // Compute the distance and two normal angles to ensure working with
       // wrong orientation. We want to verify that the angle between the

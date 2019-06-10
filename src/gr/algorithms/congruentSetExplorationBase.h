@@ -88,10 +88,11 @@ private:
 /// \brief Base class for Congruent Sec Exploration algorithms
 /// \tparam _Traits Defines properties of the Base used to build the congruent set.
 template <typename _Traits,
+          typename _PointType,
           typename _TransformVisitor,
           typename _PairFilteringFunctor, /// <\brief Must implements PairFilterConcept
           template < class, class > class ... OptExts >
-class CongruentSetExplorationBase : public MatchBase<_TransformVisitor, OptExts ..., CongruentSetExplorationOptions> {
+class CongruentSetExplorationBase : public MatchBase<_PointType, _TransformVisitor, OptExts ..., CongruentSetExplorationOptions> {
 
 public:
     using Traits = _Traits;
@@ -101,7 +102,7 @@ public:
     using Coordinates = typename Traits::Coordinates;
     using PairFilteringFunctor = _PairFilteringFunctor;
 
-    using MatchBaseType = MatchBase<_TransformVisitor, OptExts ..., CongruentSetExplorationOptions>;
+    using MatchBaseType = MatchBase<_PointType, _TransformVisitor, OptExts ..., CongruentSetExplorationOptions>;
 
     using OptionsType = typename MatchBaseType::OptionsType;
 
@@ -131,12 +132,23 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
+    // TODO: Deprecated?
     template <typename Sampler>
     Scalar ComputeTransformation(const std::vector<Point3D>& P,
                                  const std::vector<Point3D>& Q,
                                  Eigen::Ref<MatrixType> transformation,
                                  const Sampler& sampler,
                                  TransformVisitor& v);
+
+    // TODO: Implement, Document
+    template <typename Range,
+              typename Sampler>
+    Scalar ComputeTransformation(const Range& P,
+                                 const Range& Q,
+                                 Eigen::Ref<MatrixType> transformation,
+                                 const Sampler& sampler,
+                                 TransformVisitor& v);
+
 
 
 protected:

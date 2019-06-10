@@ -12,25 +12,28 @@
 
 namespace gr {
 
-    template <typename TransformVisitor,
+    template <typename PointType,
+              typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    Match3pcs<TransformVisitor, PairFilteringFunctor, PFO>::
-    Match3pcs(const Match3pcs<TransformVisitor, PairFilteringFunctor, PFO>::OptionsType &options,
+    Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::
+    Match3pcs(const Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::OptionsType &options,
                          const gr::Utils::Logger &logger)
         : MatchBaseType(options,logger)
     {
     }
 
-    template <typename TransformVisitor,
+    template <typename PointType,
+              typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    Match3pcs<TransformVisitor, PairFilteringFunctor, PFO>::~Match3pcs() {}
+    Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::~Match3pcs() {}
 
-    template <typename TransformVisitor,
+    template <typename PointType,
+              typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    bool Match3pcs<TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (CongruentBaseType &base, Set& congruent_set) {
+    bool Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (CongruentBaseType &base, Set& congruent_set) {
 
         //Find base in P (random triangle)
         if (!MatchBaseType::SelectRandomTriangle(base[0], base[1], base[2]))
@@ -56,13 +59,13 @@ namespace gr {
 
         // Find all 3pcs in Q
         for (int i=0; i<MatchBaseType::sampled_Q_3D_.size(); ++i) {
-            const Point3D& a = MatchBaseType::sampled_Q_3D_[i];
+            const PointType& a = MatchBaseType::sampled_Q_3D_[i];
             for (int j=i+1; j<MatchBaseType::sampled_Q_3D_.size(); ++j) {
-                const Point3D& b = MatchBaseType::sampled_Q_3D_[j];
+                const PointType& b = MatchBaseType::sampled_Q_3D_[j];
                 const Scalar dAB = (b.pos() - a.pos()).norm();
                 if (std::abs(dAB - d1) > MatchBaseType::distance_factor * MatchBaseType::options_.delta) continue;
                 for (int k=j+1; k<MatchBaseType::sampled_Q_3D_.size(); ++k) {
-                    const Point3D& c = MatchBaseType::sampled_Q_3D_[k];
+                    const PointType& c = MatchBaseType::sampled_Q_3D_[k];
                     const Scalar dAC = (c.pos() - a.pos()).norm();
                     const Scalar dBC = (c.pos() - b.pos()).norm();
                     if (std::abs(dAC - d2) > MatchBaseType::distance_factor * MatchBaseType::options_.delta) continue;

@@ -2,6 +2,7 @@
 // Created by Sandra Alfaro on 24/05/18.
 //
 
+#include <iterator>
 #include <vector>
 #include <atomic>
 #include <chrono>
@@ -23,11 +24,11 @@
 
 
 namespace gr {
-template <typename Traits, typename TransformVisitor,
+template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > typename ... OptExts >
-  CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::CongruentSetExplorationBase(
-          const typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::OptionsType& options
+  CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::CongruentSetExplorationBase(
+          const typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::OptionsType& options
         , const Utils::Logger& logger )
     : MatchBaseType(options, logger)
     , number_of_trials_(0)
@@ -38,36 +39,55 @@ template <typename Traits, typename TransformVisitor,
 //    , options_(options)
 {}
 
-template <typename Traits, typename TransformVisitor,
+template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::~CongruentSetExplorationBase(){}
+CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::~CongruentSetExplorationBase(){}
 
 
 // The main 4PCS function. Computes the best rigid transformation and transfoms
 // Q toward P by this transformation
-template <typename Traits, typename TransformVisitor,
+// TODO: Deprecated?
+template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
 template <typename Sampler>
-typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
-CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(
+typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
+CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(
         const std::vector<Point3D>& P,
         const std::vector<Point3D>& Q,
-        Eigen::Ref<typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
+        Eigen::Ref<typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
+        const Sampler& sampler,
+        TransformVisitor& v)
+{
+  return ComputeTransformation<std::vector<Point3D>, Sampler>(P, Q, transformation, sampler, v);
+}
+
+// TODO: Document
+template <typename Traits, typename PointType, typename TransformVisitor,
+          typename PairFilteringFunctor,
+          template < class, class > class ... OptExts >
+template <typename Range, typename Sampler>
+typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
+CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(
+        const Range& P,
+        const Range& Q,
+        Eigen::Ref<typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
         const Sampler& sampler,
         TransformVisitor& v) {
   const Scalar kSmallError = 0.00001;
   const int kMinNumberOfTrials = 4;
   const Scalar kDiameterFraction = 0.3;
-
+        
 #ifdef TEST_GLOBAL_TIMINGS
     kdTreeTime = 0;
     totalTime  = 0;
     verifyTime = 0;
 #endif
 
-  if (P.empty() || Q.empty()) return kLargeNumber;
+  auto is_range_empty = [](const Range& r) -> bool { return std::begin(r) == std::end(r); };
+
+  if (is_range_empty(P) || is_range_empty(Q)) return kLargeNumber;
 
   // RANSAC probability and number of needed trials.
   Scalar first_estimation =
@@ -110,15 +130,17 @@ CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptE
   return best_LCP_;
 }
 
+
+
 // Performs N RANSAC iterations and compute the best transformation. Also,
 // transforms the set Q by this optimal transformation.
-template <typename Traits, typename TransformVisitor,
+template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
 bool
-CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::Perform_N_steps(
+CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Perform_N_steps(
         int n,
-        Eigen::Ref<typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
+        Eigen::Ref<typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
         TransformVisitor &v) {
   using std::chrono::system_clock;
 
@@ -179,10 +201,10 @@ CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptE
 
 
 
-template <typename Traits, typename TransformVisitor,
+template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-bool CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::TryOneBase(
+bool CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::TryOneBase(
         TransformVisitor &v) {
         CongruentBaseType base;
         Set congruent_quads;
@@ -199,12 +221,12 @@ bool CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor,
         return match;
 }
 
-template <typename Traits, typename TransformVisitor,
+template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-bool CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::TryCongruentSet(
-        typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::CongruentBaseType& base,
-        typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::Set& set,
+bool CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::TryCongruentSet(
+        typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::CongruentBaseType& base,
+        typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Set& set,
         TransformVisitor &v,
         size_t &nbCongruent) {
     static const Scalar pi = std::acos(-1);
@@ -359,12 +381,12 @@ bool CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor,
 // distance at most (normalized) delta from some point in Q. In the paper
 // we describe randomized verification. We apply deterministic one here with
 // early termination. It was found to be fast in practice.
-template <typename Traits, typename TransformVisitor,
+template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
-CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::Verify(
-        const Eigen::Ref<const typename CongruentSetExplorationBase<Traits, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> &mat) const {
+typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
+CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Verify(
+        const Eigen::Ref<const typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> &mat) const {
     using RangeQuery = typename gr::KdTree<Scalar>::template RangeQuery<>;
 
 #ifdef TEST_GLOBAL_TIMINGS

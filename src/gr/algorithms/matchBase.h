@@ -69,13 +69,13 @@ struct DummyTransformVisitor {
 };
 
 /// \brief Abstract class for registration algorithms
-template <typename _TransformVisitor = DummyTransformVisitor,
-          template < class, class > typename ... OptExts >
+template <typename PointType, typename _TransformVisitor = DummyTransformVisitor,
+          template < class, class > typename ... OptExts>
 class MatchBase {
 
 public:
-    using Scalar = typename Point3D::Scalar;
-    using VectorType = typename Point3D::VectorType;
+    using Scalar = typename PointType::Scalar;
+    using VectorType = typename PointType::VectorType;
     using MatrixType = Eigen::Matrix<Scalar, 4, 4>;
     using LogLevel = Utils::LogLevel;
     using TransformVisitor = _TransformVisitor;
@@ -84,7 +84,7 @@ public:
     class Options : public TBase
     {
     public:
-        using Scalar = typename Point3D::Scalar;
+        using Scalar = typename PointType::Scalar;
 
         /// Distance threshold used to compute the LCP
         /// \todo Move to DistanceMeasure
@@ -119,12 +119,12 @@ public:
     virtual ~MatchBase();
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<Point3D>& getFirstSampled() const {
+    const std::vector<PointType>& getFirstSampled() const {
         return sampled_P_3D_;
     }
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<Point3D>& getSecondSampled() const {
+    const std::vector<PointType>& getSecondSampled() const {
         return sampled_Q_3D_;
     }
 
@@ -138,12 +138,24 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
+    // TODO: Deprecated?
     template <typename Sampler>
     Scalar ComputeTransformation(const std::vector<Point3D>& P,
                                  const std::vector<Point3D>& Q,
                                  Eigen::Ref<MatrixType> transformation,
                                  const Sampler& sampler,
                                  TransformVisitor& v) {}
+
+    // TODO: Document
+    template <typename Range,
+              typename Sampler>
+    Scalar ComputeTransformation(const Range& P,
+                                 const Range& Q,
+                                 Eigen::Ref<MatrixType> transformation,
+                                 const Sampler& sampler,
+                                 TransformVisitor& v) {}
+
+
 #endif
 
 protected:
@@ -160,9 +172,9 @@ protected:
     /// The transformation matrix by wich we transform Q to P
     Eigen::Matrix<Scalar, 4, 4> transform_;
     /// Sampled P (3D coordinates).
-    std::vector<Point3D> sampled_P_3D_;
+    std::vector<PointType> sampled_P_3D_;
     /// Sampled Q (3D coordinates).
-    std::vector<Point3D> sampled_Q_3D_;
+    std::vector<PointType> sampled_Q_3D_;
     /// The centroid of P.
     VectorType centroid_P_;
     /// The centroid of Q.
@@ -229,10 +241,24 @@ protected :
     virtual void Initialize(const std::vector<Point3D>& /*P*/,
                             const std::vector<Point3D>& /*Q*/) =0;
 
+    // TODO: Ask about it: templates may not be virtual.
+    //       Move the template parameter Range to matchBase?
+    // template<typename Range>
+    // virtual void Initialize(const Range& /*P*/,
+    //                        const Range& /*Q*/) =0;
+
+    // TODO: Deprecated?
     template <typename Sampler>
     void init(const std::vector<Point3D>& P,
               const std::vector<Point3D>& Q,
               const Sampler& sampler);
+
+    // TODO: Implement, Document
+    template <typename Range, typename Sampler>
+    void init(const Range& P,
+              const Range& Q,
+              const Sampler& sampler);
+
 private:
 
     void initKdTree();

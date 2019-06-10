@@ -54,6 +54,7 @@
 
 namespace gr {
 
+// TODO: Edit concept according to PointType&Range usage
 #ifdef PARSED_BY_DOXYGEN
 struct SamplerConcept {
     template <class Options>
@@ -115,6 +116,8 @@ private:
         }
     };
 public:
+/*
+    // TODO: Deprecated?
     template <class Options>
     inline
     void operator() (const std::vector<Point3D>& inputset,
@@ -127,6 +130,24 @@ public:
         uint64_t& ind = hash[inputset[i]];
         if (ind >= num_input) {
           output.push_back(inputset[i]);
+          ind = output.size();
+        }
+      }
+    }
+*/
+    // TODO: Document
+    template <typename PointType, typename InputRange, typename OutputRange, class Options>
+    inline
+    void operator() (const InputRange& inputset,
+                     const Options& options,
+                     OutputRange& output) const {
+      int num_input = inputset.size();
+      output.clear();
+      HashTable<PointType> hash(num_input, options.delta);
+      for (int i = 0; i < num_input; i++) {
+        uint64_t& ind = hash[PointType(inputset[i])];
+        if (ind >= num_input) {
+          output.push_back( PointType(inputset[i]) );
           ind = output.size();
         }
       }
