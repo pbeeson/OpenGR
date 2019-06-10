@@ -166,7 +166,7 @@ int main(int argc, char **argv) {
   try {
 
       if (use_super4pcs) {
-          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
 
           OptionType options;
@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
 
       }
       else {
-          using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+          using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, gr::Point3D, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
 
           OptionType options;
