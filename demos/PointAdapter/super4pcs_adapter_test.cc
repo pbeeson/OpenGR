@@ -27,11 +27,11 @@ using namespace gr;
 using namespace gr::Demo;
 
 // create a vector of extlib1::PointType1 from a vector of gr::Point3D 
-std::vector<extlib1::PointType1> getExtlib1Points(std::vector<gr::Point3D> grPoints)
+std::vector<extlib1::PointType1> getExtlib1Points(const std::vector<gr::Point3D>& grPoints)
 {
   std::vector<extlib1::PointType1> result;
 
-  for(auto &p : grPoints)
+  for(const auto &p : grPoints)
   {
     extlib1::PointType1 newp = { p.pos()(0), p.pos()(1), p.pos()(2),
                                  p.normal()(0), p.normal()(1), p.normal()(2) };
@@ -204,6 +204,7 @@ int main(int argc, char **argv) {
 /* template<class PointType, class Range, class Matcher, class Options, class Sampler, class TransformVisitor> typename PointType::Scalar computeAlignment(const Options&, const gr::Utils::Logger&, const Range&, const Range&, Eigen::Ref<Eigen::Matrix<typename PointType::Scalar, 4, 4> >, const Sampler&, TransformVisitor&) */
           extlib1::PointAdapter::Scalar score = computeAlignment<extlib1::PointAdapter, std::vector<extlib1::PointType1>, MatcherType, OptionType, SamplerType, TrVisitorType> (options, logger, set1_points1, set2_points1, mat, sampler, visitor);
 
+// TODO: After stabilizing the computeAlignment method, work on the following commented-out sections
 
       }/*
       else {
