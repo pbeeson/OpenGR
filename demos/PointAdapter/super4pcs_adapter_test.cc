@@ -70,10 +70,10 @@ struct TransformVisitor {
 };
 
 template <
-    typename PointType,
-    typename Range,
     typename Matcher,
+    typename PointType,
     typename Options,
+    typename Range,
     typename Sampler,
     typename TransformVisitor>
 typename PointType::Scalar computeAlignment (
@@ -193,7 +193,8 @@ int main(int argc, char **argv) {
   try {
 
       if (use_super4pcs) {
-          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, extlib1::PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+          using PointType = extlib1::PointAdapter;
+          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointType, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
 
           OptionType options;
@@ -201,8 +202,7 @@ int main(int argc, char **argv) {
           {
             exit(-2); /// \FIXME use status codes for error reporting
           }
-/* template<class PointType, class Range, class Matcher, class Options, class Sampler, class TransformVisitor> typename PointType::Scalar computeAlignment(const Options&, const gr::Utils::Logger&, const Range&, const Range&, Eigen::Ref<Eigen::Matrix<typename PointType::Scalar, 4, 4> >, const Sampler&, TransformVisitor&) */
-          extlib1::PointAdapter::Scalar score = computeAlignment<extlib1::PointAdapter, std::vector<extlib1::PointType1>, MatcherType, OptionType, SamplerType, TrVisitorType> (options, logger, set1_points1, set2_points1, mat, sampler, visitor);
+          PointType::Scalar score = computeAlignment<MatcherType, PointType> (options, logger, set1_points1, set2_points1, mat, sampler, visitor);
 
 // TODO: After stabilizing the computeAlignment method, work on the following commented-out sections
 
