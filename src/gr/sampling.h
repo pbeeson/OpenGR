@@ -97,9 +97,9 @@ private:
         template <typename Point>
         uint64_t& operator[](const Point& p) {
             // TODO: use eigen power here.
-            VoxelType c {int(floor(p.x() * scale_)),
-                         int(floor(p.y() * scale_)),
-                         int(floor(p.z() * scale_))};
+            VoxelType c {int(floor(p.pos()(0) * scale_)),
+                         int(floor(p.pos()(1) * scale_)),
+                         int(floor(p.pos()(2) * scale_))};
 
             uint64_t key = (MAGIC1 * c[0] + MAGIC2 * c[1] + MAGIC3 * c[2]) % data_.size();
             while (1) {

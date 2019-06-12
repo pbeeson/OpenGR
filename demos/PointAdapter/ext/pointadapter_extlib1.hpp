@@ -47,15 +47,7 @@ struct PointAdapter {
     inline const Eigen::Map< const VectorType >& normal() const { return m_normal; }
     inline const Eigen::Map< const VectorType >& color()  const { return m_color; }
     inline const Eigen::Map< const VectorType >& rgb()    const { return m_color; }
-
-/*    inline Scalar& x() { return m_pos.coeffRef(0); }
-    inline Scalar& y() { return m_pos.coeffRef(1); }
-    inline Scalar& z() { return m_pos.coeffRef(2); }
-*/
-
-    inline Scalar x() const { return m_pos.coeff(0); }
-    inline Scalar y() const { return m_pos.coeff(1); }
-    inline Scalar z() const { return m_pos.coeff(2); }
+    
 };
 
 }

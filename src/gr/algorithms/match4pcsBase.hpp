@@ -129,15 +129,15 @@ namespace gr {
 
             // The 4th point will be a one that is close to be planar to the other 3
             // while still not too close to them.
-            const double x1 = b0.x();
-            const double y1 = b0.y();
-            const double z1 = b0.z();
-            const double x2 = b1.x();
-            const double y2 = b1.y();
-            const double z2 = b1.z();
-            const double x3 = b2.x();
-            const double y3 = b2.y();
-            const double z3 = b2.z();
+            const double x1 = b0.pos()(0);
+            const double y1 = b0.pos()(1);
+            const double z1 = b0.pos()(2);
+            const double x2 = b1.pos()(0);
+            const double y2 = b1.pos()(1);
+            const double z2 = b1.pos()(2);
+            const double x3 = b2.pos()(0);
+            const double y3 = b2.pos()(1);
+            const double z3 = b2.pos()(2);
 
             // Fit a plan.
             Scalar denom = (-x3 * y2 * z1 + x2 * y3 * z1 + x3 * y1 * z2 - x1 * y3 * z2 -
@@ -161,7 +161,7 @@ namespace gr {
                         (p.pos() - b2.pos()).squaredNorm() >= too_small) {
                         // Not too close to any of the first 3.
                         const Scalar distance =
-                                std::abs(A * p.x() + B * p.y() + C * p.z() - 1.0);
+                                std::abs(A * p.pos()(0) + B * p.pos()(1) + C * p.pos()(2) - 1.0);
                         // Search for the most planar.
                         if (distance < best_distance) {
                             best_distance = distance;
