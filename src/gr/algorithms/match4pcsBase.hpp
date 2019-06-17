@@ -70,8 +70,8 @@ namespace gr {
                 // Compute the closest points on both segments, the corresponding
                 // invariants and the distance between the closest points.
                 Scalar segment_distance = distSegmentToSegment(
-                        MatchBaseType::base_3D_[i].pos(), MatchBaseType::base_3D_[j].pos(),
-                        MatchBaseType::base_3D_[k].pos(), MatchBaseType::base_3D_[l].pos(),
+                        MatchBaseType::base_3D_[i]->pos(), MatchBaseType::base_3D_[j]->pos(),
+                        MatchBaseType::base_3D_[k]->pos(), MatchBaseType::base_3D_[l]->pos(),
                         local_invariant1, local_invariant2);
                 // Retail the smallest distance and the best order so far.
                 if (segment_distance < min_distance) {
@@ -123,9 +123,9 @@ namespace gr {
                 return false;
             }
 
-            const auto& b0 = MatchBaseType::base_3D_[0] = MatchBaseType::sampled_P_3D_[base1];
-            const auto& b1 = MatchBaseType::base_3D_[1] = MatchBaseType::sampled_P_3D_[base2];
-            const auto& b2 = MatchBaseType::base_3D_[2] = MatchBaseType::sampled_P_3D_[base3];
+            const auto& b0 = *(MatchBaseType::base_3D_[0] = &MatchBaseType::sampled_P_3D_[base1]);
+            const auto& b1 = *(MatchBaseType::base_3D_[1] = &MatchBaseType::sampled_P_3D_[base2]);
+            const auto& b2 = *(MatchBaseType::base_3D_[2] = &MatchBaseType::sampled_P_3D_[base3]);
 
             // The 4th point will be a one that is close to be planar to the other 3
             // while still not too close to them.
@@ -171,7 +171,7 @@ namespace gr {
                 }
                 // If we have a good one we can quit.
                 if (base4 != -1) {
-                    MatchBaseType::base_3D_[3] = MatchBaseType::sampled_P_3D_[base4];
+                    MatchBaseType::base_3D_[3] = &MatchBaseType::sampled_P_3D_[base4];
                     if(TryQuadrilateral(invariant1, invariant2, base1, base2, base3, base4))
                         return true;
                 }
@@ -218,10 +218,10 @@ namespace gr {
       base[2] = 1;
       base[3] = 4;
 
-      MatchBaseType::base_3D_[0] = MatchBaseType::sampled_P_3D_ [base[0]];
-      MatchBaseType::base_3D_[1] = MatchBaseType::sampled_P_3D_ [base[1]];
-      MatchBaseType::base_3D_[2] = MatchBaseType::sampled_P_3D_ [base[2]];
-      MatchBaseType::base_3D_[3] = MatchBaseType::sampled_P_3D_ [base[3]];
+      MatchBaseType::base_3D_[0] = &MatchBaseType::sampled_P_3D_ [base[0]];
+      MatchBaseType::base_3D_[1] = &MatchBaseType::sampled_P_3D_ [base[1]];
+      MatchBaseType::base_3D_[2] = &MatchBaseType::sampled_P_3D_ [base[2]];
+      MatchBaseType::base_3D_[3] = &MatchBaseType::sampled_P_3D_ [base[3]];
       TryQuadrilateral(invariant1, invariant2, base[0], base[1], base[2], base[3]);
 
       first_time = false;
@@ -237,10 +237,10 @@ namespace gr {
         }
 #endif
 //        std::cout << "Found a new base !" << std::endl;
-        const auto& b0 = MatchBaseType::base_3D_[0];
-        const auto& b1 = MatchBaseType::base_3D_[1];
-        const auto& b2 = MatchBaseType::base_3D_[2];
-        const auto& b3 = MatchBaseType::base_3D_[3];
+        const auto& b0 = *MatchBaseType::base_3D_[0];
+        const auto& b1 = *MatchBaseType::base_3D_[1];
+        const auto& b2 = *MatchBaseType::base_3D_[2];
+        const auto& b3 = *MatchBaseType::base_3D_[3];
 
         // Computes distance between pairs.
         const Scalar distance1 = (b0.pos()- b1.pos()).norm();

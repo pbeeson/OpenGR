@@ -97,7 +97,7 @@ private:
         template <typename Point>
         uint64_t& operator[](const Point& p) {
             // TODO: use eigen power here.
-            VoxelType c {int(floor(p.pos()(0) * scale_)),
+            VoxelType c {int(floor(p.pos()(0) * scale_)), /* TODO */
                          int(floor(p.pos()(1) * scale_)),
                          int(floor(p.pos()(2) * scale_))};
 
@@ -147,7 +147,7 @@ public:
       for (int i = 0; i < num_input; i++) {
         uint64_t& ind = hash[PointType(inputset[i])];
         if (ind >= num_input) {
-          output.push_back( PointType(inputset[i]) );
+          output.push_back( &inputset[i] );
           ind = output.size();
         }
       }

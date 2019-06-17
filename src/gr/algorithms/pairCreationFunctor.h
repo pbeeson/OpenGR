@@ -27,7 +27,7 @@ public:
   double pair_distance;
   double pair_normals_angle;
   double pair_distance_epsilon;
-  const std::vector<PointType>& Q_;
+  const std::vector<PosMutablePoint<PointType> >& Q_;
 
   PairsVector* pairs;
 
@@ -54,7 +54,7 @@ private:
 public:
   inline PairCreationFunctor(
     const OptionType& options,
-    const std::vector<PointType>& Q)
+    const std::vector<PosMutablePoint<PointType> >& Q)
     :options_(options), Q_(Q),
      pairs(NULL), _ratio(1.f)
     { }
@@ -136,8 +136,8 @@ public:
     base_point1_ = base_point1;
     base_point2_ = base_point2;
 
-    segment1 = (base_3D_[base_point2_].pos() -
-                base_3D_[base_point1_].pos()).normalized();
+    segment1 = (base_3D_[base_point2_]->pos() -
+                base_3D_[base_point1_]->pos()).normalized();
   }
 
 
@@ -147,8 +147,8 @@ public:
 
   inline void process(int i, int j){
     if (i>j){
-      const PointType& p = Q_[j];
-      const PointType& q = Q_[i];
+      const PosMutablePoint<PointType>& p = Q_[j];
+      const PosMutablePoint<PointType>& q = Q_[i];
 
       // Compute the distance and two normal angles to ensure working with
       // wrong orientation. We want to verify that the angle between the
@@ -160,7 +160,7 @@ public:
       if (std::abs(distance - pair_distance) > pair_distance_epsilon) return;
 #endif
         FilterFunctor fun;
-        std::pair<bool,bool> res = fun(p,q, pair_normals_angle, base_3D_[base_point1_],base_3D_[base_point2_], options_);
+        std::pair<bool,bool> res = fun(p,q, pair_normals_angle, *base_3D_[base_point1_], *base_3D_[base_point2_], options_);
         if (res.first)
             pairs->emplace_back(i, j);
         if (res.second)

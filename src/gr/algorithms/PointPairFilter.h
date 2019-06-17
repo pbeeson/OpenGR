@@ -22,11 +22,11 @@ namespace gr {
       enum { IS_DUMMYPOINTFILTER_OPTIONS = true };
     };
     template <typename PointType, typename WantedOptionsAndMore>
-    inline std::pair<bool,bool> operator() (const PointType& /*p*/,
-                                            const PointType& /*q*/,
+    inline std::pair<bool,bool> operator() (const PosMutablePoint<PointType>& /*p*/,
+                                            const PosMutablePoint<PointType>& /*q*/,
                                             typename PointType::Scalar /*pair_normals_angle*/,
-                                            const PointType& /*b0*/,
-                                            const PointType& /*b1*/,
+                                            const PosMutablePoint<PointType>& /*b0*/,
+                                            const PosMutablePoint<PointType>& /*b1*/,
                                             const WantedOptionsAndMore &options) {
         return std::make_pair(options.dummyFilteringResponse, options.dummyFilteringResponse);
     }
@@ -55,11 +55,11 @@ namespace gr {
         /// A filter by point feature : normal, distance, translation distance, angle and color.
         /// Return a pair of bool, according of the right addition of the pair (p,q) or (q,p) in the congruent set.
         template <typename PointType, typename WantedOptionsAndMore>
-        inline std::pair<bool,bool> operator() (const PointType& p,
-                                                const PointType& q,
+        inline std::pair<bool,bool> operator() (const PosMutablePoint<PointType>& p,
+                                                const PosMutablePoint<PointType>& q,
                                                 typename PointType::Scalar pair_normals_angle,
-                                                const PointType& b0,
-                                                const PointType& b1,
+                                                const PosMutablePoint<PointType>& b0,
+                                                const PosMutablePoint<PointType>& b1,
                                                 const WantedOptionsAndMore &options) {
             static_assert( WantedOptionsAndMore::IS_ADAPTIVEPOINTFILTER_OPTIONS,
                            "Options passed to AdaptivePointFilter must inherit AdaptivePointFilter::Options" );

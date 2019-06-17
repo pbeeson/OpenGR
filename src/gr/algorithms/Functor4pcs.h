@@ -26,12 +26,12 @@ namespace gr {
 
     private :
         OptionType myOptions_;
-        std::vector<PointType>& mySampled_Q_3D_;
+        std::vector<PosMutablePoint<PointType> >& mySampled_Q_3D_;
         BaseCoordinates &myBase_3D_;
 
 
     public :
-        inline Functor4PCS(std::vector<PointType> &sampled_Q_3D_,
+        inline Functor4PCS(std::vector<PosMutablePoint<PointType> > &sampled_Q_3D_,
                          BaseCoordinates& base_3D_,
                          const OptionType &options)
                         :mySampled_Q_3D_(sampled_Q_3D_)
@@ -139,9 +139,9 @@ namespace gr {
 
             // Go over all ordered pairs in Q.
             for (size_t j = 0; j < mySampled_Q_3D_.size(); ++j) {
-                const PointType& p = mySampled_Q_3D_[j];
+                const PosMutablePoint<PointType>& p = mySampled_Q_3D_[j];
                 for (size_t i = j + 1; i < mySampled_Q_3D_.size(); ++i) {
-                    const PointType& q = mySampled_Q_3D_[i];
+                    const PosMutablePoint<PointType>& q = mySampled_Q_3D_[i];
 #ifndef MULTISCALE
                     // Compute the distance and two normal angles to ensure working with
                     // wrong orientation. We want to verify that the angle between the

@@ -21,7 +21,7 @@ namespace gr {
         static constexpr int size() { return 3; }
         using Base = std::array<int,3>; 
         using Set = std::vector<Base>;
-        using Coordinates = std::array<PointType, 3>;
+        using Coordinates = std::array<const PosMutablePoint<PointType>*, 3>;
     };
 
     /// Class for the computation of the 3PCS algorithm.

@@ -40,14 +40,14 @@ namespace gr {
 
 
     private :
-        std::vector<PointType> &mySampled_Q_3D_;
+        std::vector<PosMutablePoint<PointType> > &mySampled_Q_3D_;
         BaseCoordinates &myBase_3D_;
 
         mutable PairCreationFunctorType pcfunctor_;
 
 
     public :
-        inline FunctorSuper4PCS (std::vector<PointType> &sampled_Q_3D_,
+        inline FunctorSuper4PCS (std::vector<PosMutablePoint<PointType> > &sampled_Q_3D_,
                                BaseCoordinates& base_3D_,
                                const OptionType& options)
                                 : pcfunctor_ (options,mySampled_Q_3D_)
@@ -156,8 +156,8 @@ namespace gr {
 
             // Compute the angle formed by the two vectors of the basis
             const Scalar alpha =
-                    (myBase_3D_[1].pos() - myBase_3D_[0].pos()).normalized().dot(
-                            (myBase_3D_[3].pos() - myBase_3D_[2].pos()).normalized());
+                    (myBase_3D_[1]->pos() - myBase_3D_[0]->pos()).normalized().dot(
+                            (myBase_3D_[3]->pos() - myBase_3D_[2]->pos()).normalized());
 
             // 1. Datastructure construction
             const Scalar eps = pcfunctor_.getNormalizedEpsilon(distance_threshold2);

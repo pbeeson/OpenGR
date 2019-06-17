@@ -27,7 +27,7 @@ namespace gr {
         static constexpr int size() { return 4; }
         using Base = std::array<int,4>;
         using Set = std::vector<Base>;
-        using Coordinates = std::array<PointType, 4>;
+        using Coordinates = std::array<const PosMutablePoint<PointType>*, 4>;
     };
 
     /// Class for the computation of the 4PCS algorithm.

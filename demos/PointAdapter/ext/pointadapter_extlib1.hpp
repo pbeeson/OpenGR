@@ -1,6 +1,7 @@
 #ifndef __POINT_ADAPTER_EXTLIB1_H__
 #define __POINT_ADAPTER_EXTLIB1_H__
 
+#include <iostream>
 #include <Eigen/Core>
 #include "point_extlib1.hpp"
 
@@ -15,8 +16,6 @@ struct PointAdapter {
   
   private:
     Eigen::Map<const VectorType> m_pos, m_normal, m_color;
-
-    Scalar* underlying_data[3]  = { NULL, NULL, NULL };
     
   public:
     inline PointAdapter(const extlib1::PointType1& p)
@@ -25,23 +24,6 @@ struct PointAdapter {
         m_color (Eigen::Map<const VectorType >( p.color ))
     { }
 
-
-    inline PointAdapter()
-    : underlying_data{new Scalar[Dim], new Scalar[Dim], new Scalar[Dim]},
-        m_pos   (Eigen::Map<const VectorType >( underlying_data[0] )), 
-        m_normal(Eigen::Map<const VectorType >( underlying_data[1] )), 
-        m_color (Eigen::Map<const VectorType >( underlying_data[2] ))
-    {
-    }
-
-    inline ~PointAdapter()
-    {
-      for(auto &ptr : underlying_data)
-      {
-        if(ptr) delete ptr;
-        ptr = NULL;
-      }
-    }
 
     inline const Eigen::Map< const VectorType >& pos()    const { return m_pos; }  
     inline const Eigen::Map< const VectorType >& normal() const { return m_normal; }

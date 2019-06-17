@@ -152,6 +152,27 @@ class Point3D {
 //        Scalar overlap_estimation = 0.2;
 //    };
 
+// TODO: Document better
+// Wrapper around (any) PointType to allow mutation of position of PointType
+// through copying the internal position.
+template<typename PointType>
+struct PosMutablePoint : public PointType
+{
+    using VectorType = typename PointType::VectorType;
+    
+    private:
+        VectorType posCopy;
+    
+    public:
+        template<typename ExternalType>
+        PosMutablePoint(const ExternalType& i) 
+            : PointType(i), posCopy(PointType(i).pos()) { }
+
+        inline VectorType & pos() { return posCopy; }
+
+        inline VectorType pos() const { return posCopy; }
+};
+
 } /// namespace Super4PCS
 
 

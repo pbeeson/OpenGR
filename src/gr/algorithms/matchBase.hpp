@@ -138,19 +138,19 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
     // We only use the first 3 pairs. This simplifies the process considerably
     // because it is the planar case.
 
-    const VectorType& p0 = ref[0].pos();
-    const VectorType& p1 = ref[1].pos();
-    const VectorType& p2 = ref[2].pos();
-    VectorType  q0 = candidate[0].pos();
-    VectorType  q1 = candidate[1].pos();
-    VectorType  q2 = candidate[2].pos();
+    const VectorType& p0 = ref[0]->pos();
+    const VectorType& p1 = ref[1]->pos();
+    const VectorType& p2 = ref[2]->pos();
+    VectorType  q0 = candidate[0]->pos();
+    VectorType  q1 = candidate[1]->pos();
+    VectorType  q2 = candidate[2]->pos();
 
     Scalar scaleEst (1.);
 
     // Compute scale factor if needed
     if (computeScale){
-        const VectorType& p3 = ref[3].pos();
-        const VectorType& q3 = candidate[3].pos();
+        const VectorType& p3 = ref[3]->pos();
+        const VectorType& q3 = candidate[3]->pos();
 
         const Scalar ratio1 = (p1 - p0).norm() / (q1 - q0).norm();
         const Scalar ratio2 = (p3 - p2).norm() / (q3 - q2).norm();
@@ -237,9 +237,9 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
 
         //cv::Mat first(3, 1, CV_64F), transformed;
         for (int i = 0; i < 3; ++i) {
-            first = scaleEst*candidate[i].pos() - centroid2;
+            first = scaleEst*candidate[i]->pos() - centroid2;
             transformed = rotation * first;
-            rms_ += (transformed - ref[i].pos() + centroid1).norm();
+            rms_ += (transformed - ref[i]->pos() + centroid1).norm();
         }
     }
 
@@ -269,43 +269,67 @@ void MATCH_BASE_TYPE::init(const Range& P,
     sampled_P_3D_.clear();
     sampled_Q_3D_.clear();
 
-    auto copy_all_points = [](const Range& in, std::vector<PointType>& out) { 
-        for(auto& p : in) 
-            out.push_back(PointType(p));
+    // wraps instances of external point type
+    auto wrap_copy_all_points = [](
+        const Range& in,
+        std::vector<PosMutablePoint<PointType> >& out_wrapped
+        ) { 
+        for(const auto& p : in) 
+            out_wrapped.emplace_back( p );
+    };
+
+    // wraps pointer to intances of external point type
+    // wrap points with PosMutablePoint<PointType> after getting sample (range of pointer to external point type)
+    auto wrap_copy_sampled_points = [](
+        const std::vector<const typename Range::value_type *>& sampled, 
+        std::vector<PosMutablePoint<PointType> >& out_wrapped
+        ) {
+        for(const auto& p : sampled) {
+            out_wrapped.emplace_back( *p );
+        }
     };
 
     // prepare P
     if (P.size() > options_.sample_size){
-        sampler.template operator()<PointType>(P, options_, sampled_P_3D_);
+        std::vector<const typename Range::value_type *> sampled_P_3D_ptrs;
+
+        // TODO: PointType needs to be passed. However, template parameter passing on
+        // overloaded operator() seems ugly.
+        sampler.template operator()<PointType>(P, options_, sampled_P_3D_ptrs);
+
+        wrap_copy_sampled_points(sampled_P_3D_ptrs, sampled_P_3D_);
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(P) More samples requested than available: use whole cloud" );
-        copy_all_points(P, sampled_P_3D_);
+        wrap_copy_all_points(P, sampled_P_3D_);
     }
 
     // prepare Q
     if (Q.size() > options_.sample_size){
-        std::vector<PointType> uniform_Q;
-        sampler.template operator()<PointType>(Q, options_, uniform_Q);
+        std::vector<const typename Range::value_type *> uniform_Q, sampled_Q_3D_ptrs;
 
+        // TODO: PointType needs to be passed. However, template parameter passing on
+        // overloaded operator() seems ugly.
+        sampler.template operator()<PointType>(Q, options_, uniform_Q);
 
         std::shuffle(uniform_Q.begin(), uniform_Q.end(), randomGenerator_);
         size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size);
         auto endit = uniform_Q.begin(); std::advance(endit, nbSamples );
-        std::copy(uniform_Q.begin(), endit, std::back_inserter(sampled_Q_3D_));
+        std::copy(uniform_Q.begin(), endit, std::back_inserter(sampled_Q_3D_ptrs)); // TODO: performance can be improved
+        wrap_copy_sampled_points(sampled_Q_3D_ptrs, sampled_Q_3D_);
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(Q) More samples requested than available: use whole cloud" );
-        copy_all_points(Q, sampled_Q_3D_);
+        wrap_copy_all_points(Q, sampled_Q_3D_);
     }
 
 
     // center points around centroids
-    auto centerPoints = [](std::vector<PointType>&container,
+    auto centerPoints = [](std::vector<PosMutablePoint<PointType> >&container,
             VectorType& centroid){
-        for(const auto& p : container) centroid += p.pos();
+        for(auto& p : container) centroid += p.pos();
         centroid /= Scalar(container.size());
         for(auto& p : container) p.pos() -= centroid; // TODO: Problem, p is const?
     };
@@ -351,7 +375,7 @@ void MATCH_BASE_TYPE::init(const std::vector<Point3D>& P,
                      const std::vector<Point3D>& Q,
                      const Sampler& sampler)
 {
-    init<std::vector<Point3D>, Sampler>(P, Q, sampler);
+    init(P, Q, sampler);
 }
 
 }

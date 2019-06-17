@@ -235,16 +235,16 @@ bool CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilter
     Coordinates references;
 //    std::cout << "Process congruent set for base: \n";
     for (int i = 0; i!= Traits::size(); ++i) {
-        references[i] = MatchBaseType::sampled_P_3D_[base[i]];
+        references[i] = &MatchBaseType::sampled_P_3D_[base[i]];
 //        std::cout << "[" << base[i] << "]: " << references[i].pos().transpose() << "\n";
     }
     const Coordinates& ref = references;
-    Scalar targetAngle = (references[1].pos() - references[0].pos()).normalized().dot(
-          (references[3].pos() - references[2].pos()).normalized());
+    Scalar targetAngle = (ref[1]->pos() - ref[0]->pos()).normalized().dot(
+          (ref[3]->pos() - ref[2]->pos()).normalized());
 //    std::cout << "Target Angle : " << std::acos(targetAngle)*Scalar(180)/pi << std::endl;
 
     // Centroid of the basis, computed once and using only the three first points
-    Eigen::Matrix<Scalar, 3, 1> centroid1 = (ref[0].pos() + ref[1].pos() + ref[2].pos()) / Scalar(3);
+    Eigen::Matrix<Scalar, 3, 1> centroid1 = (ref[0]->pos() + ref[1]->pos() + ref[2]->pos()) / Scalar(3);
 
 //    std::cout << "Congruent set size: " << set.size() <<  std::endl;
 
@@ -257,7 +257,7 @@ bool CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilter
     for (int i = 0; i < int(set.size()); ++i) {
         const auto& congruent_ids = set[i];
         for (int j = 0; j!= Traits::size(); ++j)
-            congruent_candidate[j] = MatchBaseType::sampled_Q_3D_[congruent_ids[j]];
+            congruent_candidate[j] = &MatchBaseType::sampled_Q_3D_[congruent_ids[j]];
 
         Eigen::Matrix<Scalar, 4, 4> transform;
 
@@ -274,9 +274,9 @@ bool CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilter
             MatchBaseType::Log<LogLevel::Verbose>( congruent_ids[j], "\t");
 #endif
 
-        centroid2 = (congruent_candidate[0].pos() +
-                congruent_candidate[1].pos() +
-                congruent_candidate[2].pos()) / Scalar(3.);
+        centroid2 = (congruent_candidate[0]->pos() +
+                congruent_candidate[1]->pos() +
+                congruent_candidate[2]->pos()) / Scalar(3.);
 
         Scalar rms = -1;
 

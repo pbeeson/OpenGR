@@ -119,12 +119,12 @@ public:
     virtual ~MatchBase();
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<PointType>& getFirstSampled() const {
+    const std::vector<PosMutablePoint<PointType> >& getFirstSampled() const {
         return sampled_P_3D_;
     }
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<PointType>& getSecondSampled() const {
+    const std::vector<PosMutablePoint<PointType> >& getSecondSampled() const {
         return sampled_Q_3D_;
     }
 
@@ -172,9 +172,9 @@ protected:
     /// The transformation matrix by wich we transform Q to P
     Eigen::Matrix<Scalar, 4, 4> transform_;
     /// Sampled P (3D coordinates).
-    std::vector<PointType> sampled_P_3D_;
+    std::vector<PosMutablePoint<PointType> > sampled_P_3D_;
     /// Sampled Q (3D coordinates).
-    std::vector<PointType> sampled_Q_3D_;
+    std::vector<PosMutablePoint<PointType> > sampled_Q_3D_;
     /// The centroid of P.
     VectorType centroid_P_;
     /// The centroid of Q.

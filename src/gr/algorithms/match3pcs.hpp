@@ -44,9 +44,9 @@ namespace gr {
 
 
         // Computes distance between points.
-        const Scalar d1 = (MatchBaseType::base_3D_[0].pos()- MatchBaseType::base_3D_[1].pos()).norm();
-        const Scalar d2 = (MatchBaseType::base_3D_[0].pos()- MatchBaseType::base_3D_[2].pos()).norm();
-        const Scalar d3 = (MatchBaseType::base_3D_[1].pos()- MatchBaseType::base_3D_[2].pos()).norm();
+        const Scalar d1 = (MatchBaseType::base_3D_[0]->pos()- MatchBaseType::base_3D_[1]->pos()).norm();
+        const Scalar d2 = (MatchBaseType::base_3D_[0]->pos()- MatchBaseType::base_3D_[2]->pos()).norm();
+        const Scalar d3 = (MatchBaseType::base_3D_[1]->pos()- MatchBaseType::base_3D_[2]->pos()).norm();
 
        /*
         // Compute normal angles.
@@ -59,13 +59,13 @@ namespace gr {
 
         // Find all 3pcs in Q
         for (int i=0; i<MatchBaseType::sampled_Q_3D_.size(); ++i) {
-            const PointType& a = MatchBaseType::sampled_Q_3D_[i];
+            const PosMutablePoint<PointType>& a = MatchBaseType::sampled_Q_3D_[i];
             for (int j=i+1; j<MatchBaseType::sampled_Q_3D_.size(); ++j) {
-                const PointType& b = MatchBaseType::sampled_Q_3D_[j];
+                const PosMutablePoint<PointType>& b = MatchBaseType::sampled_Q_3D_[j];
                 const Scalar dAB = (b.pos() - a.pos()).norm();
                 if (std::abs(dAB - d1) > MatchBaseType::distance_factor * MatchBaseType::options_.delta) continue;
                 for (int k=j+1; k<MatchBaseType::sampled_Q_3D_.size(); ++k) {
-                    const PointType& c = MatchBaseType::sampled_Q_3D_[k];
+                    const PosMutablePoint<PointType>& c = MatchBaseType::sampled_Q_3D_[k];
                     const Scalar dAC = (c.pos() - a.pos()).norm();
                     const Scalar dBC = (c.pos() - b.pos()).norm();
                     if (std::abs(dAC - d2) > MatchBaseType::distance_factor * MatchBaseType::options_.delta) continue;
