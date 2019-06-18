@@ -367,16 +367,6 @@ void MATCH_BASE_TYPE::init(const Range& P,
     Initialize();
 }
 
-// TODO: Deprecated?
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
-template <typename Sampler>
-void MATCH_BASE_TYPE::init(const std::vector<Point3D>& P,
-                     const std::vector<Point3D>& Q,
-                     const Sampler& sampler)
-{
-    init(P, Q, sampler);
-}
-
 }
 
 #undef MATCH_BASE_TYPE

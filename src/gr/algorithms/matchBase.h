@@ -257,13 +257,7 @@ protected :
     /// set.
     virtual void Initialize() { }
 
-    // TODO: Deprecated?
-    template <typename Sampler>
-    void init(const std::vector<Point3D>& P,
-              const std::vector<Point3D>& Q,
-              const Sampler& sampler);
-
-    // TODO: Implement, Document
+    // TODO: Document
     template <typename Range, typename Sampler>
     void init(const Range& P,
               const Range& Q,

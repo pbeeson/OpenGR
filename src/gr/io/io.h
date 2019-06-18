@@ -44,13 +44,19 @@ public:
                   std::vector<Eigen::Matrix2f> &tex_coords,
                   std::vector<typename gr::Point3D::VectorType> &normals,
                   std::vector<tripple> &tris,
-                  std::vector<std::string> &mtls);
+                  std::vector<std::string> &mtls);           
+
+  template<typename PointRange,
+           typename TextCoordRange,
+           typename NormalRange,
+           typename TrisRange,
+           typename MTLSRange>
   bool WriteObject(const char *name,
-                   const std::vector<gr::Point3D> &v,
-                   const std::vector<Eigen::Matrix2f> &tex_coords,
-                   const std::vector<typename gr::Point3D::VectorType> &normals,
-                   const std::vector<tripple> &tris,
-                   const std::vector<std::string> &mtls);
+                   const PointRange &v,
+                   const TextCoordRange &tex_coords,
+                   const NormalRange &normals,
+                   const TrisRange &tris,
+                   const MTLSRange &mtls);
 
   bool WriteMatrix(const std::string& name,
                    const Eigen::Ref<const Eigen::Matrix<double, 4, 4> >& mat,
@@ -84,17 +90,24 @@ private:
           std::vector<tripple> &tris,
           std::vector<std::string> &mtls);
 
+  template<typename PointRange, typename NormalRange>
   bool
   WritePly(std::string name,
-           const std::vector<gr::Point3D> &v,
-           const std::vector<typename gr::Point3D::VectorType> &normals);
+           const PointRange &v,
+           const NormalRange &normals);
 
+  template<typename PointRange,
+           typename TexCoordRange,
+           typename NormalRange,
+           typename TrisRange,
+           typename MTLSRange>
   bool
   WriteObj(std::string name,
-           const std::vector<gr::Point3D> &v,
-           const std::vector<Eigen::Matrix2f> &tex_coords,
-           const std::vector<typename gr::Point3D::VectorType> &normals,
-           const std::vector<tripple> &tris, const std::vector<std::string> &mtls);
+           const PointRange &v,
+           const TexCoordRange &tex_coords,
+           const NormalRange &normals,
+           const TrisRange &tris,
+           const MTLSRange &mtls);
 
 
   /*!
@@ -108,4 +121,5 @@ private:
                         std::ofstream &sstr);
 }; // class IOMananger
 
+#include "io.hpp"
 #endif // IO_H
