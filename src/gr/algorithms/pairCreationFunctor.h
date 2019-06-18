@@ -27,7 +27,7 @@ public:
   double pair_distance;
   double pair_normals_angle;
   double pair_distance_epsilon;
-  const std::vector<PosMutablePoint<PointType> >& Q_;
+  const std::vector<PointType>& Q_;
 
   PairsVector* pairs;
 
@@ -54,7 +54,7 @@ private:
 public:
   inline PairCreationFunctor(
     const OptionType& options,
-    const std::vector<PosMutablePoint<PointType> >& Q)
+    const std::vector<PointType>& Q)
     :options_(options), Q_(Q),
      pairs(NULL), _ratio(1.f)
     { }
@@ -147,8 +147,8 @@ public:
 
   inline void process(int i, int j){
     if (i>j){
-      const PosMutablePoint<PointType>& p = Q_[j];
-      const PosMutablePoint<PointType>& q = Q_[i];
+      const PointType& p = Q_[j];
+      const PointType& q = Q_[i];
 
       // Compute the distance and two normal angles to ensure working with
       // wrong orientation. We want to verify that the angle between the

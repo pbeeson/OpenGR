@@ -27,7 +27,7 @@ namespace gr {
         static constexpr int size() { return 4; }
         using Base = std::array<int,4>;
         using Set = std::vector<Base>;
-        using Coordinates = std::array<const PosMutablePoint<PointType>*, 4>;
+        using Coordinates = std::array<const PointType*, 4>;
     };
 
     /// Class for the computation of the 4PCS algorithm.
@@ -37,11 +37,12 @@ namespace gr {
               typename _TransformVisitor,
               typename _PairFilteringFunctor,  /// <\brief Must implements PairFilterConcept
               template < class, class > typename PairFilteringOptions >
-    class Match4pcsBase : public CongruentSetExplorationBase<Traits4pcs<_PointType>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
+    class Match4pcsBase : public CongruentSetExplorationBase<Traits4pcs<typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
     public:
         using Scalar            = typename _PointType::Scalar;
         using PairFilteringFunctor = _PairFilteringFunctor;
-        using MatchBaseType     = CongruentSetExplorationBase<Traits4pcs<_PointType>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
+        using PosMutablePoint   = typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint;
+        using MatchBaseType     = CongruentSetExplorationBase<Traits4pcs<PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
         using VectorType        = typename MatchBaseType::VectorType;
         using MatrixType        = typename MatchBaseType::MatrixType;
         using TransformVisitor  = typename MatchBaseType::TransformVisitor;
@@ -49,7 +50,7 @@ namespace gr {
         using Set               = typename MatchBaseType::Set;
         using Coordinates       = typename MatchBaseType::Coordinates;
         using OptionsType       = typename MatchBaseType::OptionsType;
-        using Functor           = _Functor<_PointType, PairFilteringFunctor, OptionsType>;
+        using Functor           = _Functor<PosMutablePoint, PairFilteringFunctor, OptionsType>;
 
     protected:
         Functor fun_;

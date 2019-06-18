@@ -40,14 +40,14 @@ namespace gr {
 
 
     private :
-        std::vector<PosMutablePoint<PointType> > &mySampled_Q_3D_;
+        std::vector<PointType> &mySampled_Q_3D_;
         BaseCoordinates &myBase_3D_;
 
         mutable PairCreationFunctorType pcfunctor_;
 
 
     public :
-        inline FunctorSuper4PCS (std::vector<PosMutablePoint<PointType> > &sampled_Q_3D_,
+        inline FunctorSuper4PCS (std::vector<PointType> &sampled_Q_3D_,
                                BaseCoordinates& base_3D_,
                                const OptionType& options)
                                 : pcfunctor_ (options,mySampled_Q_3D_)

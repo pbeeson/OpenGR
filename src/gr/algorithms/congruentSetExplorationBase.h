@@ -65,7 +65,7 @@ class CongruentSetExplorationOptions : public  TBase
 {
 public:
     using Scalar = typename TBase::Scalar;
-
+    
     inline bool configureOverlap(Scalar overlap_, Scalar terminate_threshold_ = Scalar(1)) {
         if(terminate_threshold_ < overlap_) return false;
         overlap_estimation = overlap_;
@@ -103,7 +103,7 @@ public:
     using PairFilteringFunctor = _PairFilteringFunctor;
 
     using MatchBaseType = MatchBase<_PointType, _TransformVisitor, OptExts ..., CongruentSetExplorationOptions>;
-
+    using PosMutablePoint = typename MatchBaseType::PosMutablePoint;
     using OptionsType = typename MatchBaseType::OptionsType;
 
     using PairsVector =  std::vector< std::pair<int, int> >;

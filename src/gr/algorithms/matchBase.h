@@ -111,6 +111,26 @@ public:
 
     using OptionsType = gr::Utils::CRTP < OptExts ... , Options >;
 
+    // TODO: protected or public?
+    // TODO: Document better
+    // Wrapper around (any) PointType to allow mutation of position of PointType
+    // through copying the internal position.
+    struct PosMutablePoint : public PointType
+    {
+        using VectorType = typename PointType::VectorType;
+        
+        private:
+            VectorType posCopy;
+        
+        public:
+            template<typename ExternalType>
+            PosMutablePoint(const ExternalType& i) 
+                : PointType(i), posCopy(PointType(i).pos()) { }
+
+            inline VectorType & pos() { return posCopy; }
+
+            inline VectorType pos() const { return posCopy; }
+    };
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -119,12 +139,12 @@ public:
     virtual ~MatchBase();
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<PosMutablePoint<PointType> >& getFirstSampled() const {
+    const std::vector<PosMutablePoint>& getFirstSampled() const {
         return sampled_P_3D_;
     }
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<PosMutablePoint<PointType> >& getSecondSampled() const {
+    const std::vector<PosMutablePoint>& getSecondSampled() const {
         return sampled_Q_3D_;
     }
 
@@ -172,9 +192,9 @@ protected:
     /// The transformation matrix by wich we transform Q to P
     Eigen::Matrix<Scalar, 4, 4> transform_;
     /// Sampled P (3D coordinates).
-    std::vector<PosMutablePoint<PointType> > sampled_P_3D_;
+    std::vector<PosMutablePoint> sampled_P_3D_;
     /// Sampled Q (3D coordinates).
-    std::vector<PosMutablePoint<PointType> > sampled_Q_3D_;
+    std::vector<PosMutablePoint> sampled_Q_3D_;
     /// The centroid of P.
     VectorType centroid_P_;
     /// The centroid of Q.

@@ -272,17 +272,17 @@ void MATCH_BASE_TYPE::init(const Range& P,
     // wraps instances of external point type
     auto wrap_copy_all_points = [](
         const Range& in,
-        std::vector<PosMutablePoint<PointType> >& out_wrapped
+        std::vector<PosMutablePoint>& out_wrapped
         ) { 
         for(const auto& p : in) 
             out_wrapped.emplace_back( p );
     };
 
     // wraps pointer to intances of external point type
-    // wrap points with PosMutablePoint<PointType> after getting sample (range of pointer to external point type)
+    // wrap points with PosMutablePoint after getting sample (range of pointer to external point type)
     auto wrap_copy_sampled_points = [](
         const std::vector<const typename Range::value_type *>& sampled, 
-        std::vector<PosMutablePoint<PointType> >& out_wrapped
+        std::vector<PosMutablePoint>& out_wrapped
         ) {
         for(const auto& p : sampled) {
             out_wrapped.emplace_back( *p );
@@ -327,7 +327,7 @@ void MATCH_BASE_TYPE::init(const Range& P,
 
 
     // center points around centroids
-    auto centerPoints = [](std::vector<PosMutablePoint<PointType> >&container,
+    auto centerPoints = [](std::vector<PosMutablePoint>&container,
             VectorType& centroid){
         for(auto& p : container) centroid += p.pos();
         centroid /= Scalar(container.size());

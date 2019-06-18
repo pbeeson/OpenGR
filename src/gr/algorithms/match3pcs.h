@@ -21,7 +21,7 @@ namespace gr {
         static constexpr int size() { return 3; }
         using Base = std::array<int,3>; 
         using Set = std::vector<Base>;
-        using Coordinates = std::array<const PosMutablePoint<PointType>*, 3>;
+        using Coordinates = std::array<const PointType*, 3>;
     };
 
     /// Class for the computation of the 3PCS algorithm.
@@ -29,9 +29,10 @@ namespace gr {
               typename _TransformVisitor,
               typename _PairFilteringFunctor,  /// <\brief Must implements PairFilterConcept
               template < class, class > typename PairFilteringOptions >
-    class Match3pcs : public CongruentSetExplorationBase<Traits3pcs, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
+    class Match3pcs : public CongruentSetExplorationBase<Traits3pcs<typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
     public:
-      using Traits               = Traits3pcs<_PointType>;
+      using PosMutablePoint      = typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint;
+      using Traits               = Traits3pcs<PosMutablePoint>;
       using PairFilteringFunctor = _PairFilteringFunctor;
       using TransformVisitor     = _TransformVisitor;
 
@@ -39,7 +40,7 @@ namespace gr {
       using Set                  = typename Traits::Set;
       using Coordinates          = typename Traits::Coordinates;
 
-      using MatchBaseType = CongruentSetExplorationBase<Traits3pcs<_PointType>, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
+      using MatchBaseType = CongruentSetExplorationBase<Traits3pcs<PosMutablePoint>, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
 
       using OptionsType = typename MatchBaseType::OptionsType;
       using Scalar      = typename MatchBaseType::Scalar;
