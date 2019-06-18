@@ -148,7 +148,7 @@ namespace gr {
                     if (std::abs(distance - pair_distance) > pair_distance_epsilon) continue;
 #endif
 
-                    std::pair<bool,bool> res = fun(p,q, pair_normals_angle, myBase_3D_[base_point1],myBase_3D_[base_point2], myOptions_);
+                    std::pair<bool,bool> res = fun(p,q, pair_normals_angle, *myBase_3D_[base_point1],*myBase_3D_[base_point2], myOptions_);
                     if (res.first)
                         pairs->emplace_back(i, j);
                     if (res.second)

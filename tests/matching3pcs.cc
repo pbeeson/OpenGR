@@ -213,7 +213,7 @@ void test_model(const vector<Transform> &transforms,
     mergedset.insert(mergedset.end(), set1.begin(), set1.end());
 
     // Our matcher.
-    using MatcherType = gr::Match3pcs<TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+    using MatcherType = gr::Match3pcs<gr::Point3D, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
     using OptionType  = typename MatcherType::OptionsType;
     using SamplerType   = gr::UniformDistSampler;
 

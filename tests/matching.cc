@@ -274,7 +274,7 @@ void test_model(const vector<Transform> &transforms,
     Scalar score = 0.;
 
     if(use_super4pcs){
-        using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+        using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
         using OptionType  = typename MatcherType::OptionsType;
 
         OptionType options;
@@ -300,7 +300,7 @@ void test_model(const vector<Transform> &transforms,
         else
           score = matcher.ComputeTransformation(mergedset, set2, mat, sampler, visitor);
     }else{
-        using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+        using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, gr::Point3D, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
         using OptionType  = typename MatcherType::OptionsType;
 
         OptionType options;

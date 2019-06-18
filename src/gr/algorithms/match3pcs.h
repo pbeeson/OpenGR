@@ -40,7 +40,7 @@ namespace gr {
       using Set                  = typename Traits::Set;
       using Coordinates          = typename Traits::Coordinates;
 
-      using MatchBaseType = CongruentSetExplorationBase<Traits3pcs<PosMutablePoint>, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
+      using MatchBaseType = CongruentSetExplorationBase<Traits3pcs<PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
 
       using OptionsType = typename MatchBaseType::OptionsType;
       using Scalar      = typename MatchBaseType::Scalar;

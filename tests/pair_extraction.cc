@@ -254,10 +254,10 @@ void callSubTests()
     }
 }
 
-template <template <typename, typename> typename FunctorType>
+template <template <typename, typename, typename> typename FunctorType>
 void callMatch4SubTestsWithFunctor()
 {
-    using MatcherType = gr::Match4pcsBase<FunctorType, TrVisitorType, gr::DummyPointFilter, gr::DummyPointFilter::Options>;
+    using MatcherType = gr::Match4pcsBase<FunctorType, gr::Point3D, TrVisitorType, gr::DummyPointFilter, gr::DummyPointFilter::Options>;
     using Scalar = typename MatcherType::Scalar;
     using PairsVector = typename MatcherType::PairsVector;
     using OptionType  = typename MatcherType::OptionsType;

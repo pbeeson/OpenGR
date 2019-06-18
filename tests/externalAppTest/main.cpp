@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
   using TrVisitor = gr::DummyTransformVisitor;
 
-  using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, TrVisitor, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+  using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D, TrVisitor, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
   using OptionType  = typename MatcherType::OptionsType;
   using SamplerType = gr::UniformDistSampler;
 
