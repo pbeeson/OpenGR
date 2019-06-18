@@ -40,11 +40,7 @@ namespace gr {
 
         /// Initializes the data structures and needed values before the match
         /// computation.
-        /// @param [in] point_P First input set.
-        /// @param [in] point_Q Second input set.
-        /// expected to be in the inliers.
-        inline void Initialize(const std::vector<Point3D>& /*P*/,
-                                   const std::vector<Point3D>& /*Q*/) {}
+        inline void Initialize() {}
 
         /// Finds congruent candidates in the set Q, given the invariants and threshold distances.
         /// Returns true if a non empty set can be found, false otherwise.
