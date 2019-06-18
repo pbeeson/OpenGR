@@ -83,13 +83,9 @@ namespace gr {
 
         /// Initializes the data structures and needed values before the match
         /// computation.
-        /// @param [in] point_P First input set.
-        /// @param [in] point_Q Second input set.
-        /// expected to be in the inliers.
         /// This method is called once the internal state of the Base class as been
         /// set.
-        void Initialize(const std::vector<Point3D>& /*P*/,
-                        const std::vector<Point3D>& /*Q*/) override;
+        void Initialize() override;
 
         /// Find all the congruent set similar to the base in the second 3D model (Q).
         /// It could be with a 3 point base or a 4 point base.

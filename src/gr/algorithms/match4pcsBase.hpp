@@ -189,10 +189,8 @@ namespace gr {
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
     // Initialize all internal data structures and data members.
-    void Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Initialize(
-        const std::vector<Point3D>& P,
-        const std::vector<Point3D>& Q) {
-        fun_.Initialize(P,Q);
+    void Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Initialize() {
+        fun_.Initialize();
     }
 
 

@@ -56,11 +56,7 @@ namespace gr {
 
         /// Initializes the data structures and needed values before the match
         /// computation.
-        /// @param [in] point_P First input set.
-        /// @param [in] point_Q Second input set.
-        /// expected to be in the inliers.
-        inline void Initialize(const std::vector<Point3D>& /*P*/,
-                                   const std::vector<Point3D>& /*Q*/) {
+        inline void Initialize() {
             pcfunctor_.synch3DContent();
         }
 

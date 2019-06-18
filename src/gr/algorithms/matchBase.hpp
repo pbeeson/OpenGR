@@ -364,8 +364,7 @@ void MATCH_BASE_TYPE::init(const Range& P,
     transform_ = Eigen::Matrix<Scalar, 4, 4>::Identity();
 
     // call Virtual handler
-    // TODO: Ask about this.
-    //Initialize(P,Q);
+    Initialize();
 }
 
 // TODO: Deprecated?

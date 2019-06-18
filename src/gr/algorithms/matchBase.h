@@ -253,19 +253,9 @@ protected :
 
     /// Initializes the data structures and needed values before the match
     /// computation.
-    /// @param [in] point_P First input set.
-    /// @param [in] point_Q Second input set.
-    /// expected to be in the inliers.
     /// This method is called once the internal state of the Base class as been
     /// set.
-    virtual void Initialize(const std::vector<Point3D>& /*P*/,
-                            const std::vector<Point3D>& /*Q*/) =0;
-
-    // TODO: Ask about it: templates may not be virtual.
-    //       Move the template parameter Range to matchBase?
-    // template<typename Range>
-    // virtual void Initialize(const Range& /*P*/,
-    //                        const Range& /*Q*/) =0;
+    virtual void Initialize() { }
 
     // TODO: Deprecated?
     template <typename Sampler>
