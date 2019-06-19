@@ -144,10 +144,11 @@ public:
       int num_input = inputset.size();
       output.clear();
       HashTable<PointType> hash(num_input, options.delta);
-      for (int i = 0; i < num_input; i++) {
-        uint64_t& ind = hash[PointType(inputset[i])];
+      
+      for(const auto& p : inputset) {
+        uint64_t& ind = hash[PointType(p)];
         if (ind >= num_input) {
-          output.push_back( &inputset[i] );
+          output.push_back( &p );
           ind = output.size();
         }
       }
