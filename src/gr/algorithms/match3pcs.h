@@ -55,6 +55,9 @@ namespace gr {
         /// \param base use to find the similar points congruent in Q.
         /// \param congruent_set a set of all point congruent found in Q.
         bool generateCongruents (CongruentBaseType& base, Set& congruent_quads) override;
+
+        // TODO: Document
+        bool initBase(CongruentBaseType &base) override;
     };
 }
 

@@ -202,38 +202,10 @@ namespace gr {
     bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (
         CongruentBaseType &base, Set& congruent_quads) {
 //      std::cout << "------------------" << std::endl;
+        Scalar invariant1, invariant2;
 
-      Scalar invariant1, invariant2;
-//#define STATIC_BASE
+        if(!initBase(base, invariant1, invariant2)) return false;
 
-#ifdef STATIC_BASE
-  static bool first_time = true;
-
-  if (first_time){
-      std::cerr << "Warning: Running with static base" << std::endl;
-      base[0] = 0;
-      base[1] = 3;
-      base[2] = 1;
-      base[3] = 4;
-
-      MatchBaseType::base_3D_[0] = &MatchBaseType::sampled_P_3D_ [base[0]];
-      MatchBaseType::base_3D_[1] = &MatchBaseType::sampled_P_3D_ [base[1]];
-      MatchBaseType::base_3D_[2] = &MatchBaseType::sampled_P_3D_ [base[2]];
-      MatchBaseType::base_3D_[3] = &MatchBaseType::sampled_P_3D_ [base[3]];
-      TryQuadrilateral(invariant1, invariant2, base[0], base[1], base[2], base[3]);
-
-      first_time = false;
-  }
-  else
-      return false;
-
-#else
-        if (!SelectQuadrilateral(invariant1, invariant2, base[0], base[1],
-                                 base[2], base[3])) {
-//            std::cout << "Skipping wrong base" << std::endl;
-            return false;
-        }
-#endif
 //        std::cout << "Found a new base !" << std::endl;
         const auto& b0 = *MatchBaseType::base_3D_[0];
         const auto& b1 = *MatchBaseType::base_3D_[1];
@@ -274,6 +246,57 @@ namespace gr {
 
         return true;
     }
+
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
+              typename TransformVisitor,
+              typename PairFilteringFunctor,
+              template < class, class > typename PFO>
+    bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base)
+    {
+        Scalar invariant1, invariant2; // dummy
+
+        return initBase(base, invariant1, invariant2);
+    }
+
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
+              typename TransformVisitor,
+              typename PairFilteringFunctor,
+              template < class, class > typename PFO>
+    bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base, Scalar& invariant1, Scalar& invariant2)
+    {
+        #ifdef STATIC_BASE
+        static bool first_time = true;
+
+        if (first_time){
+            std::cerr << "Warning: Running with static base" << std::endl;
+            base[0] = 0;
+            base[1] = 3;
+            base[2] = 1;
+            base[3] = 4;
+
+            MatchBaseType::base_3D_[0] = &MatchBaseType::sampled_P_3D_ [base[0]];
+            MatchBaseType::base_3D_[1] = &MatchBaseType::sampled_P_3D_ [base[1]];
+            MatchBaseType::base_3D_[2] = &MatchBaseType::sampled_P_3D_ [base[2]];
+            MatchBaseType::base_3D_[3] = &MatchBaseType::sampled_P_3D_ [base[3]];
+            TryQuadrilateral(invariant1, invariant2, base[0], base[1], base[2], base[3]);
+
+            first_time = false;
+        }
+        else
+            return false;
+
+        #else
+            if (!SelectQuadrilateral(invariant1, invariant2, base[0], base[1], base[2], base[3])) {
+                // std::cout << "Skipping wrong base" << std::endl;
+                return false;
+            }
+        #endif
+
+        return true;
+    }
+
 
     template <template <typename, typename, typename> typename _Functor,
               typename PointType,

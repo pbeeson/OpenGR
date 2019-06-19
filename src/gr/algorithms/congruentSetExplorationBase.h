@@ -209,6 +209,9 @@ protected :
     /// \param congruent_set a set of all point congruent found in Q.
     virtual bool generateCongruents (CongruentBaseType& base,Set& congruent_set) = 0;
 
+    // TODO: Document
+    virtual bool initBase (CongruentBaseType &base = CongruentBaseType()) = 0;
+
     /// For each randomly picked base, verifies the computed transformation by
     /// computing the number of points that this transformation brings near points
     /// in Q. Returns the current LCP. R is the rotation matrix, (tx,ty,tz) is

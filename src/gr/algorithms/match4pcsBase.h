@@ -93,10 +93,15 @@ namespace gr {
         /// \param congruent_set a set of all point congruent found in Q.
         bool generateCongruents (CongruentBaseType& base,Set& congruent_quads) override;
 
+        // TODO: Document
+        bool initBase(CongruentBaseType &base) override;
+
     private:
         static inline Scalar distSegmentToSegment( const VectorType& p1, const VectorType& p2,
                                                    const VectorType& q1, const VectorType& q2,
                                                    Scalar& invariant1, Scalar& invariant2);
+
+        bool initBase(CongruentBaseType &base, Scalar& invariant1, Scalar& invariant2);
     };
 }
 

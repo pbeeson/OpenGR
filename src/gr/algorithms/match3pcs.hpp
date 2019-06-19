@@ -36,12 +36,7 @@ namespace gr {
     bool Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (CongruentBaseType &base, Set& congruent_set) {
 
         //Find base in P (random triangle)
-        if (!MatchBaseType::SelectRandomTriangle(base[0], base[1], base[2]))
-            return false;
-        MatchBaseType::base_3D_ [0] = &MatchBaseType::sampled_P_3D_[base[0]];
-        MatchBaseType::base_3D_ [1] = &MatchBaseType::sampled_P_3D_[base[1]];
-        MatchBaseType::base_3D_ [2] = &MatchBaseType::sampled_P_3D_[base[2]];
-
+        if(!initBase(base)) return false;
 
         // Computes distance between points.
         const Scalar d1 = (MatchBaseType::base_3D_[0]->pos()- MatchBaseType::base_3D_[1]->pos()).norm();
@@ -92,4 +87,20 @@ namespace gr {
         return congruent_set.size()!=0;
     }
 
+
+    template <typename PointType,
+              typename TransformVisitor,
+              typename PairFilteringFunctor,
+              template < class, class > typename PFO>
+    bool Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base)
+    {
+        if (!MatchBaseType::SelectRandomTriangle(base[0], base[1], base[2]))
+            return false;
+
+        MatchBaseType::base_3D_ [0] = &MatchBaseType::sampled_P_3D_[base[0]];
+        MatchBaseType::base_3D_ [1] = &MatchBaseType::sampled_P_3D_[base[1]];
+        MatchBaseType::base_3D_ [2] = &MatchBaseType::sampled_P_3D_[base[2]];
+
+        return true;
+    }
 }

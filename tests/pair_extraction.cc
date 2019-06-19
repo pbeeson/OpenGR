@@ -300,6 +300,9 @@ void callMatch4SubTestsWithFunctor()
         // extract point using matcher
         Testing::TestMatcher<MatcherType> match (opt, logger);
         match.init(P, Q, sampler);
+        // Init base (not interested in what base is, therefore, use dummy ref)
+        typename MatcherType::CongruentBaseType dummy;
+        match.initBase(dummy);
 
         std::vector<std::pair<int, int>> pairs1, pairs2;
         match.getFunctor().ExtractPairs(distance1,
