@@ -15,6 +15,12 @@
 
 #include "../demo-utils.h"
 
+#include "ext/point_conversion.h"
+#include "ext/point_extlib1.hpp"
+#include "ext/point_extlib2.hpp"
+#include "ext/pointadapter_extlib1.hpp"
+#include "ext/pointadapter_extlib2.hpp"
+
 #define sqr(x) ((x) * (x))
 
 using namespace std;
@@ -52,15 +58,17 @@ struct TransformVisitor {
 
 template <
     typename Matcher,
+    typename PointType,
     typename Options,
+    typename Range,
     typename Sampler,
     typename TransformVisitor>
-typename Point3D::Scalar computeAlignment (
+typename PointType::Scalar computeAlignment (
     const Options& options,
     const Utils::Logger& logger,
-    const std::vector<Point3D>& P,
-    const std::vector<Point3D>& Q,
-    Eigen::Ref<Eigen::Matrix<typename Point3D::Scalar, 4, 4>> mat,
+    const Range& P,
+    const Range& Q,
+    Eigen::Ref<Eigen::Matrix<typename PointType::Scalar, 4, 4>> mat,
     const Sampler& sampler,
     TransformVisitor& visitor
     ) {
@@ -108,6 +116,8 @@ typename Point3D::Scalar computeAlignment (
 int main(int argc, char **argv) {
   using namespace gr;
 
+  // Point clouds are read as gr::Point3D, then converted to other types if necessary to
+  // emulate PointAdapter usage
   vector<Point3D> set1, set2;
   vector<Eigen::Matrix2f> tex_coords1, tex_coords2;
   vector<typename Point3D::VectorType> normals1, normals2;
@@ -166,29 +176,139 @@ int main(int argc, char **argv) {
   try {
 
       if (use_super4pcs) {
-          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+        if(point_type == 0) // gr::Point3D, directly pass the read sets
+        {
+          using PointType    = gr::Point3D;
+          using PointAdapter = gr::Point3D;
+          using MatcherType  = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+          using OptionType   = typename MatcherType::OptionsType;
+
+          OptionType options;
+          if(! Demo::setOptionsFromArgs(options, logger))
+            exit(-2); /// \FIXME use status codes for error reporting
+
+          score = computeAlignment<MatcherType, PointAdapter> (options, logger, set1, set2, mat, sampler, visitor);
+        }
+        else if(point_type == 1) // extlib1::PointType1, convert read sets to vector of PointType1 to emulate PointAdapter usage
+        {
+          logger.Log<Utils::Verbose>("Registration on std::vector of extlib1::PointType1 instances using extlib1::PointAdapter");
+          using PointType    = extlib1::PointType1;
+          using PointAdapter = extlib1::PointAdapter;
+          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
 
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))
-          {
             exit(-2); /// \FIXME use status codes for error reporting
+
+          auto set1_point1 = getExtlib1Points(set1);
+          auto set2_point1 = getExtlib1Points(set2);
+
+          score = computeAlignment<MatcherType, PointAdapter> (options, logger, set1_point1, set2_point1, mat, sampler, visitor);
+        }
+        else if(point_type == 2) // extlib2::PointType2, convert read sets to vector of PointType2 to emulate PointAdapter usage
+        {
+          logger.Log<Utils::Verbose>("Registration on std::list of extlib2::PointType2 instances using extlib2::PointAdapter");
+          using PointType    = extlib2::PointType2;
+          using PointAdapter = extlib2::PointAdapter;
+          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+          using OptionType  = typename MatcherType::OptionsType;
+
+          OptionType options;
+          if(! Demo::setOptionsFromArgs(options, logger))
+            exit(-2); /// \FIXME use status codes for error reporting
+
+          auto set1_point2 = getExtlib2Points(set1);
+          auto set2_point2 = getExtlib2Points(set2);
+
+          score = computeAlignment<MatcherType, PointAdapter> (options, logger, set1_point2, set2_point2, mat, sampler, visitor);
+
+          // deallocate memory for points2
+          if(!set1_point2.empty()) {
+            delete[] set1_point2.front().posBuffer;
+            delete[] set1_point2.front().nBuffer;
+            delete[] set1_point2.front().colorBuffer;
+            set1_point2.clear();
           }
 
-          score = computeAlignment<MatcherType> (options, logger, set1, set2, mat, sampler, visitor);
-
+          if(!set2_point2.empty()) {
+            delete[] set2_point2.front().posBuffer;
+            delete[] set2_point2.front().nBuffer;
+            delete[] set2_point2.front().colorBuffer;
+            set2_point2.clear();
+          }
+        }
+        else
+        {
+          std::cerr << "Invalid point type" << std::endl;
+          exit(-1);
+        }
       }
       else {
-          using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, gr::Point3D, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+        // 4PCS
+        if(point_type == 0) // gr::Point3D, directly pass the read sets
+        {
+          using PointType    = gr::Point3D;
+          using PointAdapter = gr::Point3D;
+          using MatcherType  = gr::Match4pcsBase<gr::Functor4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+          using OptionType   = typename MatcherType::OptionsType;
+
+          OptionType options;
+          if(! Demo::setOptionsFromArgs(options, logger))
+            exit(-2); /// \FIXME use status codes for error reporting
+
+          score = computeAlignment<MatcherType, PointAdapter> (options, logger, set1, set2, mat, sampler, visitor);
+        }
+        else if(point_type == 1) // extlib1::PointType1, convert read sets to vector of PointType1 to emulate PointAdapter usage
+        {
+          logger.Log<Utils::Verbose>("Registration on std::vector of extlib1::PointType1 instances using extlib1::PointAdapter");
+          using PointType    = extlib1::PointType1;
+          using PointAdapter = extlib1::PointAdapter;
+          using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
 
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))
-          {
             exit(-2); /// \FIXME use status codes for error reporting
+
+          auto set1_point1 = getExtlib1Points(set1);
+          auto set2_point1 = getExtlib1Points(set2);
+
+          score = computeAlignment<MatcherType, PointAdapter> (options, logger, set1_point1, set2_point1, mat, sampler, visitor);
+        }
+        else if(point_type == 2) // extlib2::PointType2, convert read sets to vector of PointType2 to emulate PointAdapter usage
+        {
+          logger.Log<Utils::Verbose>("Registration on std::vector of extlib2::PointType2 instances using extlib2::PointAdapter");
+          using PointType    = extlib2::PointType2;
+          using PointAdapter = extlib2::PointAdapter;
+          using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+          using OptionType  = typename MatcherType::OptionsType;
+
+          OptionType options;
+          if(! Demo::setOptionsFromArgs(options, logger))
+            exit(-2); /// \FIXME use status codes for error reporting
+
+          auto set1_point2 = getExtlib2Points(set1);
+          auto set2_point2 = getExtlib2Points(set2);
+
+          score = computeAlignment<MatcherType, PointAdapter> (options, logger, set1_point2, set2_point2, mat, sampler, visitor);
+          
+          // deallocate memory for points2
+          if(!set1_point2.empty()) {
+            delete[] set1_point2.front().posBuffer;
+            delete[] set1_point2.front().nBuffer;
+            delete[] set1_point2.front().colorBuffer;
+            set1_point2.clear();
           }
 
-          score = computeAlignment<MatcherType> (options, logger, set1, set2, mat, sampler, visitor);
+          if(!set2_point2.empty()) {
+            delete[] set2_point2.front().posBuffer;
+            delete[] set2_point2.front().nBuffer;
+            delete[] set2_point2.front().colorBuffer;
+            set2_point2.clear();
+          }
+
+        }
       }
 
   }

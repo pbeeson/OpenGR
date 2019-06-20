@@ -27,6 +27,7 @@ struct PointAdapter {
     inline const Eigen::Map< const VectorType >& pos()    const { return m_pos; }  
     inline const Eigen::Map< const VectorType >& normal() const { return m_normal; }
     inline const Eigen::Map< const VectorType >& color()  const { return m_color; }
+    inline const Eigen::Map< const VectorType >& rgb()  const { return m_color; }
 
 };
 

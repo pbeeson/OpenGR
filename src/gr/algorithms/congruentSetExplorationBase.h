@@ -210,7 +210,7 @@ protected :
     virtual bool generateCongruents (CongruentBaseType& base,Set& congruent_set) = 0;
 
     // TODO: Document
-    virtual bool initBase (CongruentBaseType &base = CongruentBaseType()) = 0;
+    virtual bool initBase (CongruentBaseType &base) = 0;
 
     /// For each randomly picked base, verifies the computed transformation by
     /// computing the number of points that this transformation brings near points
