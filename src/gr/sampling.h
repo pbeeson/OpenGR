@@ -51,16 +51,14 @@
 #include <array>
 #include "gr/shared.h"
 
-
 namespace gr {
 
-// TODO: Edit concept according to PointType&Range usage
 #ifdef PARSED_BY_DOXYGEN
 struct SamplerConcept {
-    template <class Options>
-    void operator() (const std::vector<Point3D>& /*inputset*/,
+    template <typename PointType, typename InputRange, typename OutputRange, class Options>
+    void operator() (const InputRange& /*inputset*/,
                      const Options& /*options*/,
-                     std::vector<Point3D>& /*output*/) const{}
+                     OutputRange& /*output*/) const{}
 };
 #endif
 
