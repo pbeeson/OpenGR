@@ -80,3 +80,9 @@ template <typename _TransformVisitor >
 class Variant1 : public MyCustomMatcherBase<_TransformVisitor, Variant1Options> { /* ... */ };
 }
 ```
+
+
+## Add your own point filter
+The generic matcher type gr::CongruentSetExplorationBase allows filtering pair of points during exploration, which is done with point filters that are attachable while instantiation of matcher class, effective at inherited gr::Match3pcs and gr::Match4pcsBase types. If you plan to use your filtering logic considering the features of your point samples, you could implement gr::PairFilterConcept and attach it to your preferred matcher of descendent type of gr::CongruentSetExplorationBase while type instantiation.
+
+OpenGR provides gr::AdaptivePointFilter, an implementation of gr::PairFilterConcept, which is a point filter that filters pairs of points using their normal, color and max motion features when available. For using arbitrary attributes of your point type in your point filter, check @ref using-your-point-type page.
