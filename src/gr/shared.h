@@ -56,9 +56,37 @@
 
 namespace gr {
 
+// TODO
+#ifdef PARSED_BY_DOXYGEN
+struct ExternalPoint;
+
+struct PointConcept {
+    public:
+    /*! \brief Defines the ambient space dimension */
+    enum {Dim = 3};
+    
+    /*! \brief Defines the type used ton encode scalar values */
+    typedef float Scalar;
+
+    /*! \brief Defines type used to encode vector values */
+    typedef Eigen::Matrix<Scalar, Dim, 1> VectorType;
+    
+    /*! \brief Constructor using external point type that is wrapped */
+    inline PointConcept(const ExternalPoint&) { }
+    
+    /*! \brief Read access to the position property */
+    inline const VectorType& pos() const { }  
+};
+#endif
+
 /// The basic 3D point structure. A point potentially contains also directional
 /// information and color.
-class Point3D {
+/// \implements PointConcept
+class Point3D
+#ifdef PARSED_BY_DOXYGEN
+    : public PointConcept
+#endif
+{
  public:
   using Scalar = float; //_Scalar;
   using VectorType = Eigen::Matrix<Scalar, 3, 1>;
