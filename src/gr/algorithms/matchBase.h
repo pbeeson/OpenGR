@@ -111,10 +111,8 @@ public:
 
     using OptionsType = gr::Utils::CRTP < OptExts ... , Options >;
 
-    // TODO: protected or public?
-    // TODO: Document better
-    // Wrapper around (any) PointType to allow mutation of position of PointType
-    // through copying the internal position.
+    /// A convenience class used to wrap (any) PointType to allow mutation of position
+    /// of point samples for internal computations. 
     struct PosMutablePoint : public PointType
     {
         using VectorType = typename PointType::VectorType;
@@ -158,7 +156,6 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
-    // TODO: Deprecated?
     template <typename Sampler>
     Scalar ComputeTransformation(const std::vector<Point3D>& P,
                                  const std::vector<Point3D>& Q,
@@ -166,7 +163,14 @@ public:
                                  const Sampler& sampler,
                                  TransformVisitor& v) {}
 
-    // TODO: Document
+    /// Computes an approximation of the best LCP (directional) from Q to P
+    /// and the rigid transformation that realizes it. The input sets may or may
+    /// not contain normal information for any point.
+    /// @param [in] P The first input set.
+    /// @param [in] Q The second input set.
+    /// @param [out] transformation Rigid transformation matrix (4x4) that brings
+    /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
+    /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
     template <typename Range,
               typename Sampler>
     Scalar ComputeTransformation(const Range& P,
@@ -257,7 +261,10 @@ protected :
     /// set.
     virtual void Initialize() { }
 
-    // TODO: Document
+    /// Initializes the internal state of the Base class
+    /// @param P The first input set.
+    /// @param Q The second input set.
+    /// @param sampler The sampler used to sample the input sets.
     template <typename Range, typename Sampler>
     void init(const Range& P,
               const Range& Q,

@@ -130,7 +130,7 @@ namespace gr {
                 Scalar distance_threshold2,
                 const std::vector<std::pair<int, int>>& First_pairs,
                 const std::vector<std::pair<int, int>>& Second_pairs,
-               typename Traits4pcs<PointType>::Set* quadrilaterals) const { // TODO: change to template type
+               typename Traits4pcs<PointType>::Set* quadrilaterals) const {
 
             typedef typename PairCreationFunctorType::Point Point;
 

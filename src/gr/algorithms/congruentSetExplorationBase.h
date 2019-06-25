@@ -132,7 +132,6 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
-    // TODO: Deprecated?
     template <typename Sampler>
     Scalar ComputeTransformation(const std::vector<Point3D>& P,
                                  const std::vector<Point3D>& Q,
@@ -140,7 +139,14 @@ public:
                                  const Sampler& sampler,
                                  TransformVisitor& v);
 
-    // TODO: Implement, Document
+    /// Computes an approximation of the best LCP (directional) from Q to P
+    /// and the rigid transformation that realizes it. The input sets may or may
+    /// not contain normal information for any point.
+    /// @param [in] P The first input set.
+    /// @param [in] Q The second input set.
+    /// @param [out] transformation Rigid transformation matrix (4x4) that brings
+    /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
+    /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
     template <typename Range,
               typename Sampler>
     Scalar ComputeTransformation(const Range& P,
@@ -149,8 +155,12 @@ public:
                                  const Sampler& sampler,
                                  TransformVisitor& v);
 
-
-
+    /// Tries to compute an inital base from P
+    /// @param [out] base The base, if found. Initial value is not used. Modified as 
+    /// the computed base if the return value is true.
+    /// @return true if a base is found an initialized, false otherwise
+    virtual bool initBase (CongruentBaseType &base) = 0;
+    
 protected:
     /// Number of trials. Every trial picks random base from P.
     int number_of_trials_;
@@ -208,9 +218,6 @@ protected :
     /// \param base use to find the similar points congruent in Q.
     /// \param congruent_set a set of all point congruent found in Q.
     virtual bool generateCongruents (CongruentBaseType& base,Set& congruent_set) = 0;
-
-    // TODO: Document
-    virtual bool initBase (CongruentBaseType &base) = 0;
 
     /// For each randomly picked base, verifies the computed transformation by
     /// computing the number of points that this transformation brings near points

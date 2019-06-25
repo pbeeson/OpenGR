@@ -56,7 +56,10 @@ namespace gr {
         /// \param congruent_set a set of all point congruent found in Q.
         bool generateCongruents (CongruentBaseType& base, Set& congruent_quads) override;
 
-        // TODO: Document
+        /// Tries to compute an inital base from P
+        /// @param [out] base The base, if found. Initial value is not used. Modified as 
+        /// the computed base if the return value is true.
+        /// @return true if a base is found an initialized, false otherwise
         bool initBase(CongruentBaseType &base) override;
     };
 }

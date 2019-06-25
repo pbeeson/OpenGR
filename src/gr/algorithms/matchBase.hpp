@@ -256,7 +256,6 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
     return true;
 }
 
-// TODO: init() method with range
 template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 template <typename Range, typename Sampler>
 void MATCH_BASE_TYPE::init(const Range& P,
@@ -331,7 +330,7 @@ void MATCH_BASE_TYPE::init(const Range& P,
             VectorType& centroid){
         for(auto& p : container) centroid += p.pos();
         centroid /= Scalar(container.size());
-        for(auto& p : container) p.pos() -= centroid; // TODO: Problem, p is const?
+        for(auto& p : container) p.pos() -= centroid;
     };
     centerPoints(sampled_P_3D_, centroid_P_);
     centerPoints(sampled_Q_3D_, centroid_Q_);

@@ -133,7 +133,6 @@ public:
       }
     }
 */
-    // TODO: Document
     template <typename PointType, typename InputRange, typename OutputRange, class Options>
     inline
     void operator() (const InputRange& inputset,

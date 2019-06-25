@@ -47,7 +47,6 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
 
 // The main 4PCS function. Computes the best rigid transformation and transfoms
 // Q toward P by this transformation
-// TODO: Deprecated?
 template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
@@ -63,7 +62,8 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
   return ComputeTransformation<std::vector<Point3D>, Sampler>(P, Q, transformation, sampler, v);
 }
 
-// TODO: Document
+// The main 4PCS function. Computes the best rigid transformation and transfoms
+// Q toward P by this transformation
 template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >

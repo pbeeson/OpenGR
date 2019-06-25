@@ -56,7 +56,6 @@
 
 namespace gr {
 
-// TODO
 #ifdef PARSED_BY_DOXYGEN
 struct ExternalPoint;
 
