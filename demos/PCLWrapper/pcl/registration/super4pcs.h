@@ -121,7 +121,7 @@ namespace pcl
 
 
       using SamplerType   = gr::UniformDistSampler;
-      using MatcherType   = gr::Match4pcsBase<gr::FunctorSuper4PCS, TransformVisitor, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+      using MatcherType   = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D, TransformVisitor, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
       using OptionType    = typename MatcherType::OptionsType;
 
       OptionType options_;
