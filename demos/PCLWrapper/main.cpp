@@ -31,7 +31,7 @@ main (int argc, char **argv)
   PointCloudT::Ptr scene (new PointCloudT);
 
   // Get input object and scene
-  if (argc < 4)
+  if (argc < 3)
   {
     pcl::console::print_error ("Syntax is: %s scene.obj object.obj [PARAMS]\n", argv[0]);
     Demo::printParameterList();
