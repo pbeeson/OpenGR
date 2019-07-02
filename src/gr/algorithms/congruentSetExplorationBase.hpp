@@ -24,6 +24,12 @@
 
 
 namespace gr {
+
+namespace internal {
+  template<typename Range>
+  inline bool is_range_empty(const Range& r) { return std::begin(r) == std::end(r); }
+}
+
 template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > typename ... OptExts >
@@ -59,7 +65,7 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
         const Sampler& sampler,
         TransformVisitor& v)
 {
-  return ComputeTransformation<std::vector<Point3D>, Sampler>(P, Q, transformation, sampler, v);
+  return ComputeTransformation<std::vector<Point3D>, std::vector<Point3D>, Sampler>(P, Q, transformation, sampler, v);
 }
 
 // The main 4PCS function. Computes the best rigid transformation and transfoms
@@ -67,11 +73,11 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
 template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-template <typename Range, typename Sampler>
+template <typename InputRange1, typename InputRange2, typename Sampler>
 typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
 CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(
-        const Range& P,
-        const Range& Q,
+        const InputRange1& P,
+        const InputRange2& Q,
         Eigen::Ref<typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
         const Sampler& sampler,
         TransformVisitor& v) {
@@ -85,9 +91,7 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
     verifyTime = 0;
 #endif
 
-  auto is_range_empty = [](const Range& r) -> bool { return std::begin(r) == std::end(r); };
-
-  if (is_range_empty(P) || is_range_empty(Q)) return kLargeNumber;
+  if (internal::is_range_empty(P) || internal::is_range_empty(Q)) return kLargeNumber;
 
   // RANSAC probability and number of needed trials.
   Scalar first_estimation =

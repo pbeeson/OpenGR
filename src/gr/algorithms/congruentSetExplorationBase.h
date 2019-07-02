@@ -147,10 +147,11 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
-    template <typename Range,
+    template <typename InputRange1,
+              typename InputRange2,
               typename Sampler>
-    Scalar ComputeTransformation(const Range& P,
-                                 const Range& Q,
+    Scalar ComputeTransformation(const InputRange1& P,
+                                 const InputRange2& Q,
                                  Eigen::Ref<MatrixType> transformation,
                                  const Sampler& sampler,
                                  TransformVisitor& v);

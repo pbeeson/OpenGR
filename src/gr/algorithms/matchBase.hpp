@@ -256,10 +256,27 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
     return true;
 }
 
+namespace internal {
+    // wraps instances of external point type
+    template<typename InputRange, typename OutputRange>
+    inline void wrap_copy_all_points(const InputRange& in, OutputRange& out_wrapped) { 
+        for(const auto& p : in) 
+            out_wrapped.emplace_back( p );
+    }
+
+    // wraps pointer to intances of external point type
+    // wrap points with PosMutablePoint after getting sample (range of pointer to external point type)
+    template<typename InputRange, typename OutputRange>
+    inline void wrap_copy_sampled_points(const InputRange& sampled, OutputRange& out_wrapped) {
+        for(const auto& p : sampled) 
+            out_wrapped.emplace_back( *p );
+    }
+} // namespace internal
+
 template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
-template <typename Range, typename Sampler>
-void MATCH_BASE_TYPE::init(const Range& P,
-              const Range& Q,
+template <typename InputRange1, typename InputRange2, typename Sampler>
+void MATCH_BASE_TYPE::init(const InputRange1& P,
+              const InputRange2& Q,
               const Sampler& sampler) {
 
     centroid_P_ = VectorType::Zero();
@@ -268,45 +285,25 @@ void MATCH_BASE_TYPE::init(const Range& P,
     sampled_P_3D_.clear();
     sampled_Q_3D_.clear();
 
-    // wraps instances of external point type
-    auto wrap_copy_all_points = [](
-        const Range& in,
-        std::vector<PosMutablePoint>& out_wrapped
-        ) { 
-        for(const auto& p : in) 
-            out_wrapped.emplace_back( p );
-    };
-
-    // wraps pointer to intances of external point type
-    // wrap points with PosMutablePoint after getting sample (range of pointer to external point type)
-    auto wrap_copy_sampled_points = [](
-        const std::vector<const typename Range::value_type *>& sampled, 
-        std::vector<PosMutablePoint>& out_wrapped
-        ) {
-        for(const auto& p : sampled) {
-            out_wrapped.emplace_back( *p );
-        }
-    };
-
     // prepare P
     if (P.size() > options_.sample_size){
-        std::vector<const typename Range::value_type *> sampled_P_3D_ptrs;
+        std::vector<const typename InputRange1::value_type *> sampled_P_3D_ptrs;
 
         // TODO: PointType needs to be passed. However, template parameter passing on
         // overloaded operator() seems ugly.
         sampler.template operator()<PointType>(P, options_, sampled_P_3D_ptrs);
 
-        wrap_copy_sampled_points(sampled_P_3D_ptrs, sampled_P_3D_);
+        internal::wrap_copy_sampled_points(sampled_P_3D_ptrs, sampled_P_3D_);
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(P) More samples requested than available: use whole cloud" );
-        wrap_copy_all_points(P, sampled_P_3D_);
+        internal::wrap_copy_all_points(P, sampled_P_3D_);
     }
 
     // prepare Q
     if (Q.size() > options_.sample_size){
-        std::vector<const typename Range::value_type *> uniform_Q, sampled_Q_3D_ptrs;
+        std::vector<const typename InputRange2::value_type *> uniform_Q, sampled_Q_3D_ptrs;
 
         // TODO: PointType needs to be passed. However, template parameter passing on
         // overloaded operator() seems ugly.
@@ -316,12 +313,12 @@ void MATCH_BASE_TYPE::init(const Range& P,
         size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size);
         auto endit = uniform_Q.begin(); std::advance(endit, nbSamples );
         std::copy(uniform_Q.begin(), endit, std::back_inserter(sampled_Q_3D_ptrs)); // TODO: performance can be improved
-        wrap_copy_sampled_points(sampled_Q_3D_ptrs, sampled_Q_3D_);
+        internal::wrap_copy_sampled_points(sampled_Q_3D_ptrs, sampled_Q_3D_);
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(Q) More samples requested than available: use whole cloud" );
-        wrap_copy_all_points(Q, sampled_Q_3D_);
+        internal::wrap_copy_all_points(Q, sampled_Q_3D_);
     }
 
 
@@ -366,6 +363,6 @@ void MATCH_BASE_TYPE::init(const Range& P,
     Initialize();
 }
 
-}
+} // namespace gr
 
 #undef MATCH_BASE_TYPE
