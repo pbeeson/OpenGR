@@ -5,6 +5,7 @@
 #include <vector>
 #include <atomic>
 #include <chrono>
+#include <numeric> // std::iota
 
 #ifdef OpenGR_USE_OPENMP
 #include <omp.h>
@@ -256,23 +257,6 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
     return true;
 }
 
-namespace internal {
-    // wraps instances of external point type
-    template<typename InputRange, typename OutputRange>
-    inline void wrap_copy_all_points(const InputRange& in, OutputRange& out_wrapped) { 
-        for(const auto& p : in) 
-            out_wrapped.emplace_back( p );
-    }
-
-    // wraps pointer to intances of external point type
-    // wrap points with PosMutablePoint after getting sample (range of pointer to external point type)
-    template<typename InputRange, typename OutputRange>
-    inline void wrap_copy_sampled_points(const InputRange& sampled, OutputRange& out_wrapped) {
-        for(const auto& p : sampled) 
-            out_wrapped.emplace_back( *p );
-    }
-} // namespace internal
-
 template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 template <typename InputRange1, typename InputRange2, typename Sampler>
 void MATCH_BASE_TYPE::init(const InputRange1& P,
@@ -287,38 +271,46 @@ void MATCH_BASE_TYPE::init(const InputRange1& P,
 
     // prepare P
     if (P.size() > options_.sample_size){
-        std::vector<const typename InputRange1::value_type *> sampled_P_3D_ptrs;
+        std::vector<typename InputRange1::value_type > sampled_P_3D;
 
         // TODO: PointType needs to be passed. However, template parameter passing on
         // overloaded operator() seems ugly.
-        sampler.template operator()<PointType>(P, options_, sampled_P_3D_ptrs);
-
-        internal::wrap_copy_sampled_points(sampled_P_3D_ptrs, sampled_P_3D_);
+        sampler.template operator()<PointType>(P, options_, sampled_P_3D_);
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(P) More samples requested than available: use whole cloud" );
-        internal::wrap_copy_all_points(P, sampled_P_3D_);
+
+        // copy all the points
+        std::copy(P.begin(), P.end(), std::back_inserter(sampled_P_3D_));
     }
 
     // prepare Q
     if (Q.size() > options_.sample_size){
-        std::vector<const typename InputRange2::value_type *> uniform_Q, sampled_Q_3D_ptrs;
+        std::vector<typename InputRange2::value_type> uniform_Q, sampled_Q_3D;
 
         // TODO: PointType needs to be passed. However, template parameter passing on
         // overloaded operator() seems ugly.
         sampler.template operator()<PointType>(Q, options_, uniform_Q);
-
-        std::shuffle(uniform_Q.begin(), uniform_Q.end(), randomGenerator_);
+    
+        std::vector<int> indices(uniform_Q.size());
+        std::iota( std::begin(indices), std::end(indices), 0 );
+        std::shuffle(indices.begin(), indices.end(), randomGenerator_);
         size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size);
-        auto endit = uniform_Q.begin(); std::advance(endit, nbSamples );
-        std::copy(uniform_Q.begin(), endit, std::back_inserter(sampled_Q_3D_ptrs)); // TODO: performance can be improved
-        internal::wrap_copy_sampled_points(sampled_Q_3D_ptrs, sampled_Q_3D_);
+        indices.resize(nbSamples);
+
+        // using the indices, copy elements from uniform_Q to sampled_P_3D_
+        for(int i : indices) 
+            sampled_Q_3D_.emplace_back(uniform_Q[i]);
+        
+        uniform_Q.clear();
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(Q) More samples requested than available: use whole cloud" );
-        internal::wrap_copy_all_points(Q, sampled_Q_3D_);
+        
+        // copy all the points
+        std::copy(Q.begin(), Q.end(), std::back_inserter(sampled_Q_3D_));
     }
 
 

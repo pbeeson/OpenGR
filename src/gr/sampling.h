@@ -145,7 +145,7 @@ public:
       for(const auto& p : inputset) {
         uint64_t& ind = hash[PointType(p)];
         if (ind >= num_input) {
-          output.push_back( &p );
+          output.push_back( p );
           ind = output.size();
         }
       }
