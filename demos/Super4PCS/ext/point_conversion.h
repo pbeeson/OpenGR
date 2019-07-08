@@ -14,7 +14,8 @@
 #include <list>
 
 // create a vector of extlib1::PointType1 from a vector of gr::Point3D 
-inline std::vector<extlib1::PointType1> getExtlib1Points(const std::vector<gr::Point3D>& grPoints)
+template<typename Scalar>
+inline std::vector<extlib1::PointType1> getExtlib1Points(const std::vector<gr::Point3D<Scalar> >& grPoints)
 {
   std::vector<extlib1::PointType1> result;
 
@@ -31,7 +32,8 @@ inline std::vector<extlib1::PointType1> getExtlib1Points(const std::vector<gr::P
 }
 
 // create a list of extlib2::PointType2 from a vector of gr::Point3D 
-inline std::list<extlib2::PointType2> getExtlib2Points(const std::vector<gr::Point3D>& grPoints)
+template<typename Scalar>
+inline std::list<extlib2::PointType2> getExtlib2Points(const std::vector<gr::Point3D<Scalar> >& grPoints)
 {
   using PointType2 = extlib2::PointType2;
 

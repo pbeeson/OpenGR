@@ -81,7 +81,7 @@ void callSubTests()
     for(int i = 0; i < Testing::g_repeat; ++i)
     {
         // generate input point cloud
-        std::vector<Point3D> P, Q;
+        std::vector<Point3D<float> > P, Q;
         Testing::generateSphereCloud(P, nbPointP);
         Testing::generateSphereCloud(Q, nbPointQ);
 

@@ -39,10 +39,11 @@ public:
 
 public:
   // Obj read/write simple functions.
+  template<typename Scalar>
   bool ReadObject(const char *name,
-                  std::vector<gr::Point3D> &v,
+                  std::vector<gr::Point3D<Scalar> > &v,
                   std::vector<Eigen::Matrix2f> &tex_coords,
-                  std::vector<typename gr::Point3D::VectorType> &normals,
+                  std::vector<typename gr::Point3D<Scalar>::VectorType> &normals,
                   std::vector<tripple> &tris,
                   std::vector<std::string> &mtls);           
 
@@ -62,10 +63,11 @@ public:
                    const Eigen::Ref<const Eigen::Matrix<double, 4, 4> >& mat,
                    MATRIX_MODE mode);
 private:
+  template<typename Scalar>
   bool
   ReadPly(const char *name,
-          std::vector<gr::Point3D> &v,
-          std::vector<typename gr::Point3D::VectorType> &normals);
+          std::vector<gr::Point3D<Scalar> > &v,
+          std::vector<typename gr::Point3D<Scalar>::VectorType> &normals);
 
   /*!
    * \brief ReadPtx
@@ -78,15 +80,17 @@ private:
    * Implementation inspired by
    *            http://github.com/adasta/pcl_io_extra/blob/master/src/ptx_io.cpp
    */
+  template<typename Scalar>
   bool
   ReadPtx(const char *name,
-          std::vector<gr::Point3D> &v);
+          std::vector<gr::Point3D<Scalar> > &v);
 
+  template<typename Scalar>
   bool
   ReadObj(const char *name,
-          std::vector<gr::Point3D> &v,
+          std::vector<gr::Point3D<Scalar> > &v,
           std::vector<Eigen::Matrix2f> &tex_coords,
-          std::vector<typename gr::Point3D::VectorType> &normals,
+          std::vector<typename gr::Point3D<Scalar>::VectorType> &normals,
           std::vector<tripple> &tris,
           std::vector<std::string> &mtls);
 
@@ -122,4 +126,5 @@ private:
 }; // class IOMananger
 
 #include "io.hpp"
+#include "io_ply.h"
 #endif // IO_H

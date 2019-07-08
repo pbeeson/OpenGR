@@ -257,7 +257,7 @@ void callSubTests()
 template <template <typename, typename, typename> typename FunctorType>
 void callMatch4SubTestsWithFunctor()
 {
-    using MatcherType = gr::Match4pcsBase<FunctorType, gr::Point3D, TrVisitorType, gr::DummyPointFilter, gr::DummyPointFilter::Options>;
+    using MatcherType = gr::Match4pcsBase<FunctorType, gr::Point3D<float>, TrVisitorType, gr::DummyPointFilter, gr::DummyPointFilter::Options>;
     using Scalar = typename MatcherType::Scalar;
     using PairsVector = typename MatcherType::PairsVector;
     using OptionType  = typename MatcherType::OptionsType;
@@ -285,7 +285,7 @@ void callMatch4SubTestsWithFunctor()
     {
 
         // generate input point cloud
-        std::vector<Point3D> P, Q;
+        std::vector<Point3D<float> > P, Q;
         Testing::generateSphereCloud(P, nbPointP);
         Testing::generateSphereCloud(Q, nbPointQ);
 

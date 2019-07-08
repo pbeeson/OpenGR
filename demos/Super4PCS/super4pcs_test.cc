@@ -74,7 +74,7 @@ typename PointType::Scalar computeAlignment (
     ) {
   Matcher matcher (options, logger);
   logger.Log<Utils::Verbose>( "Starting registration" );
-  typename Point3D::Scalar score = matcher.ComputeTransformation(P, Q, mat, sampler, visitor);
+  typename PointType::Scalar score = matcher.ComputeTransformation(P, Q, mat, sampler, visitor);
 
 
   logger.Log<Utils::Verbose>( "Score: ", score );
@@ -92,7 +92,7 @@ typename PointType::Scalar computeAlignment (
       iomananger.WriteObject((char *)outputSampled1.c_str(),
                              matcher.getFirstSampled(),
                              vector<Eigen::Matrix2f>(),
-                             vector<typename Point3D::VectorType>(),
+                             vector<typename Point3D<float>::VectorType>(), // dummy
                              vector<tripple>(),
                              vector<string>());
       logger.Log<Utils::Verbose>( "Export DONE" );
@@ -104,7 +104,7 @@ typename PointType::Scalar computeAlignment (
       iomananger.WriteObject((char *)outputSampled2.c_str(),
                              matcher.getSecondSampled(),
                              vector<Eigen::Matrix2f>(),
-                             vector<typename Point3D::VectorType>(),
+                             vector<typename Point3D<float>::VectorType>(), // dummy
                              vector<tripple>(),
                              vector<string>());
       logger.Log<Utils::Verbose>( "Export DONE" );
@@ -115,17 +115,17 @@ typename PointType::Scalar computeAlignment (
 
 int main(int argc, char **argv) {
   using namespace gr;
-
+  using Scalar = float;
   // Point clouds are read as gr::Point3D, then converted to other types if necessary to
   // emulate PointAdapter usage
-  vector<Point3D> set1, set2;
+  vector<Point3D<Scalar> > set1, set2;
   vector<Eigen::Matrix2f> tex_coords1, tex_coords2;
-  vector<typename Point3D::VectorType> normals1, normals2;
+  vector<typename Point3D<Scalar>::VectorType> normals1, normals2;
   vector<tripple> tris1, tris2;
   vector<std::string> mtls1, mtls2;
 
   // Match and return the score (estimated overlap or the LCP).
-  typename Point3D::Scalar score = 0;
+  typename Point3D<Scalar>::Scalar score = 0;
 
   constexpr Utils::LogLevel loglvl = Utils::Verbose;
   using SamplerType   = gr::UniformDistSampler;
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
   }
 
   // prepare matcher ressourcesoutputSampled2
-  using MatrixType = Eigen::Matrix<typename Point3D::Scalar, 4, 4>;
+  using MatrixType = Eigen::Matrix<typename Point3D<Scalar>::Scalar, 4, 4>;
   MatrixType mat (MatrixType::Identity());
 
   // Read the inputs.
@@ -178,8 +178,8 @@ int main(int argc, char **argv) {
       if (use_super4pcs) {
         if(point_type == 0) // gr::Point3D, directly pass the read sets
         {
-          using PointType    = gr::Point3D;
-          using PointAdapter = gr::Point3D;
+          using PointType    = gr::Point3D<Scalar>;
+          using PointAdapter = gr::Point3D<Scalar>;
           using MatcherType  = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType   = typename MatcherType::OptionsType;
 
@@ -248,8 +248,8 @@ int main(int argc, char **argv) {
         // 4PCS
         if(point_type == 0) // gr::Point3D, directly pass the read sets
         {
-          using PointType    = gr::Point3D;
-          using PointAdapter = gr::Point3D;
+          using PointType    = gr::Point3D<Scalar>;
+          using PointAdapter = gr::Point3D<Scalar>;
           using MatcherType  = gr::Match4pcsBase<gr::Functor4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType   = typename MatcherType::OptionsType;
 

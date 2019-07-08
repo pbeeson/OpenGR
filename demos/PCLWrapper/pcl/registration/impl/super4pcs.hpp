@@ -61,10 +61,10 @@ pcl::Super4PCS<PointSource, PointTarget>::computeTransformation (PointCloudSourc
   SamplerType sampler;
   TransformVisitor visitor;
 
-  std::vector<gr::Point3D> set1, set2;
+  std::vector<gr::Point3D<float> > set1, set2;
 
   // init Super4PCS point cloud internal structure
-  auto fillPointSet = [] (const PointCloudSource& m, std::vector<gr::Point3D>& out) {
+  auto fillPointSet = [] (const PointCloudSource& m, std::vector<gr::Point3D<float> >& out) {
       out.clear();
       out.reserve(m.size());
 
