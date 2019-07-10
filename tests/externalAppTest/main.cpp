@@ -13,13 +13,13 @@ int main(int argc, char **argv) {
 
   using TrVisitor = gr::DummyTransformVisitor;
 
-  using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D, TrVisitor, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
+  using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D<float>, TrVisitor, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
   using OptionType  = typename MatcherType::OptionsType;
   using SamplerType = gr::UniformDistSampler;
 
-  vector<Point3D> set1, set2;
+  vector<Point3D<float> > set1, set2;
   vector<Eigen::Matrix2f> tex_coords1, tex_coords2;
-  vector<typename Point3D::VectorType> normals1, normals2;
+  vector<typename Point3D<float>::VectorType> normals1, normals2;
   vector<tripple> tris1, tris2;
   vector<std::string> mtls1, mtls2;
 
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
   double overlap (1);
   options.configureOverlap(overlap);
 
-  typename Point3D::Scalar score = 0;
+  typename Point3D<float>::Scalar score = 0;
 
   constexpr Utils::LogLevel loglvl = Utils::Verbose;
   Utils::Logger logger(loglvl);

@@ -5,7 +5,6 @@
 #define _OPENGR_IO_HPP_
 
 #include <Eigen/Geometry>
-#include <stb_image.h>
 
 #include <string>
 #include <iterator>
@@ -405,7 +404,7 @@ IOManager::ReadObj(const char *filename,
 
         // ... x = width, y = height, n = # 8-bit components per pixel ...
         int width,height,n;
-        unsigned char *data = stbi_load((workingDir + img_name).c_str(), &width, &height, &n, STBI_rgb);
+        unsigned char *data = stbi_load_((workingDir + img_name).c_str(), &width, &height, &n, STBI_rgb);
 
         if (data != nullptr) {
             for (int i = 0; i < tris.size(); ++i) {
@@ -430,10 +429,10 @@ IOManager::ReadObj(const char *filename,
               setcolor( v[t.b - 1], tc2.coeffRef(0), tc2.coeffRef(1) );
               setcolor( v[t.c - 1], tc3.coeffRef(0), tc3.coeffRef(1) );
             }
-            stbi_image_free(data);
+            stbi_image_free_(data);
         } else {
             std::cerr << "Image loading failed: "
-                      << stbi_failure_reason() << "\n"
+                      << stbi_failure_reason_() << "\n"
                       << "Path: " << workingDir + img_name
                       << std::endl;
         }

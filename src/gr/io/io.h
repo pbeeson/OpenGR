@@ -112,8 +112,7 @@ private:
            const NormalRange &normals,
            const TrisRange &tris,
            const MTLSRange &mtls);
-
-
+           
   /*!
    * \brief formatPolyworksMatrix Format 4x4 matrice so it can be loaded by polyworks
    * \param mat
@@ -123,6 +122,20 @@ private:
   std::ofstream &
   formatPolyworksMatrix(const Eigen::Ref<const Eigen::Matrix<double, 4, 4> >& mat,
                         std::ofstream &sstr);
+
+  /// Wrapped STBI functions to be used inside template methods
+  /// Limits dependency on stb just to compilation of the library by compiling
+  /// required stbi methods to object files at library compilation.
+  unsigned char*
+  stbi_load_(char const *filename, int *x, int *y, int *comp, int req_comp);
+
+  void
+  stbi_image_free_(void *retval_from_stbi_load);
+  
+  const char *
+  stbi_failure_reason_(void);
+
+  static const int STBI_rgb = 3;
 }; // class IOMananger
 
 #include "io.hpp"

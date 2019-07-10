@@ -60,6 +60,24 @@ IOManager::formatPolyworksMatrix(
     return sstr;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Wrapped STBI functions to be used inside template methods
+/// Limits dependency on stb just to compilation of the library
+////////////////////////////////////////////////////////////////////////////////
+unsigned char*
+IOManager::stbi_load_(char const *filename, int *x, int *y, int *comp, int req_comp)
+{
+    return stbi_load(filename, x, y, comp, req_comp);
+}
 
-
-
+void
+IOManager::stbi_image_free_(void *retval_from_stbi_load)
+{
+    return stbi_image_free(retval_from_stbi_load);
+}
+  
+const char *
+IOManager::stbi_failure_reason_(void)
+{
+    return stbi_failure_reason();
+}
