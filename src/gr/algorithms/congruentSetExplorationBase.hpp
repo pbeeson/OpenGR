@@ -56,23 +56,6 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
 template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-template <typename Sampler>
-typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
-CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(
-        const std::vector<Point3D>& P,
-        const std::vector<Point3D>& Q,
-        Eigen::Ref<typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
-        const Sampler& sampler,
-        TransformVisitor& v)
-{
-  return ComputeTransformation<std::vector<Point3D>, std::vector<Point3D>, Sampler>(P, Q, transformation, sampler, v);
-}
-
-// The main 4PCS function. Computes the best rigid transformation and transfoms
-// Q toward P by this transformation
-template <typename Traits, typename PointType, typename TransformVisitor,
-          typename PairFilteringFunctor,
-          template < class, class > class ... OptExts >
 template <typename InputRange1, typename InputRange2, typename Sampler>
 typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
 CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(

@@ -132,21 +132,6 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
-    template <typename Sampler>
-    Scalar ComputeTransformation(const std::vector<Point3D>& P,
-                                 const std::vector<Point3D>& Q,
-                                 Eigen::Ref<MatrixType> transformation,
-                                 const Sampler& sampler,
-                                 TransformVisitor& v);
-
-    /// Computes an approximation of the best LCP (directional) from Q to P
-    /// and the rigid transformation that realizes it. The input sets may or may
-    /// not contain normal information for any point.
-    /// @param [in] P The first input set.
-    /// @param [in] Q The second input set.
-    /// @param [out] transformation Rigid transformation matrix (4x4) that brings
-    /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
-    /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
     template <typename InputRange1,
               typename InputRange2,
               typename Sampler>
