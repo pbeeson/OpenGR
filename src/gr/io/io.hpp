@@ -35,7 +35,6 @@ bool IOManager::WriteObject(
   const MTLSRange &mtls)
 {
   std::string filename (name);
-  std::string ext = filename.substr(filename.size()-3);
 
   bool haveExt = filename.at(filename.size()-4) == '.';
 
@@ -130,7 +129,7 @@ IOManager::WritePly(
       plyFile.write(reinterpret_cast<const char*>( &(*normal_it)(0) ),sizeof(float));
       plyFile.write(reinterpret_cast<const char*>( &(*normal_it)(1) ),sizeof(float));
       plyFile.write(reinterpret_cast<const char*>( &(*normal_it)(2) ),sizeof(float));
-      normal_it++;
+      ++normal_it;
     }
 
     if(useColors)
