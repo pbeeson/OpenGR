@@ -218,7 +218,7 @@ void test_model(const vector<Transform> &transforms,
                 int i,
                 int param_i){
     using namespace gr;
-    using SamplerType   = gr::UniformDistSampler;
+    using SamplerType   = gr::UniformDistSampler<gr::Point3D<float> >;
 
     const string input1 = files.at(i-1);
     const string input2 = files.at(i);

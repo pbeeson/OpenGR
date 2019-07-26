@@ -56,13 +56,13 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
 template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-template <typename InputRange1, typename InputRange2, typename Sampler>
+template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
 typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
 CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(
         const InputRange1& P,
         const InputRange2& Q,
         Eigen::Ref<typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::MatrixType> transformation,
-        const Sampler& sampler,
+        const Sampler<PointType>& sampler,
         TransformVisitor& v) {
   const Scalar kSmallError = 0.00001;
   const int kMinNumberOfTrials = 4;

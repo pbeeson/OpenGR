@@ -54,18 +54,19 @@
 namespace gr {
 
 #ifdef PARSED_BY_DOXYGEN
+template<typename PointType>
 struct SamplerConcept {
-    template <typename PointType, typename InputRange, typename OutputRange, class Options>
+    template <typename InputRange, typename OutputRange, class Options>
     void operator() (const InputRange& /*inputset*/,
                      const Options& /*options*/,
                      OutputRange& /*output*/) const{}
 };
 #endif
 
-
+template<typename PointType>
 struct UniformDistSampler
 #ifdef PARSED_BY_DOXYGEN
-    : public SamplerConcept
+    : public SamplerConcept<PointType>
 #endif
 {
 private:
@@ -112,44 +113,26 @@ private:
             }
             return data_[key];
         }
-    };
-public:
-/*
-    // TODO: Deprecated?
-    template <class Options>
-    inline
-    void operator() (const std::vector<Point3D>& inputset,
-                     const Options& options,
-                     std::vector<Point3D>& output) const {
-      int num_input = inputset.size();
-      output.clear();
-      HashTable<Point3D> hash(num_input, options.delta);
-      for (int i = 0; i < num_input; i++) {
-        uint64_t& ind = hash[inputset[i]];
-        if (ind >= num_input) {
-          output.push_back(inputset[i]);
-          ind = output.size();
+    }; // end of class definition HashTable
+
+    public:
+        template <typename InputRange, typename OutputRange, class Options>
+        inline
+        void operator() (const InputRange& inputset,
+                        const Options& options,
+                        OutputRange& output) const {
+            int num_input = inputset.size();
+            output.clear();
+            HashTable<PointType> hash(num_input, options.delta);
+            
+            for(const auto& p : inputset) {
+                uint64_t& ind = hash[PointType(p)];
+                if (ind >= num_input) {
+                output.push_back( p );
+                ind = output.size();
+                }
+            }
         }
-      }
-    }
-*/
-    template <typename PointType, typename InputRange, typename OutputRange, class Options>
-    inline
-    void operator() (const InputRange& inputset,
-                     const Options& options,
-                     OutputRange& output) const {
-      int num_input = inputset.size();
-      output.clear();
-      HashTable<PointType> hash(num_input, options.delta);
-      
-      for(const auto& p : inputset) {
-        uint64_t& ind = hash[PointType(p)];
-        if (ind >= num_input) {
-          output.push_back( p );
-          ind = output.size();
-        }
-      }
-    }
 };
 
 

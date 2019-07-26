@@ -173,11 +173,11 @@ public:
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
     template <typename InputRange1,
               typename InputRange2,
-              typename Sampler>
+              template<typename> typename Sampler>
     Scalar ComputeTransformation(const InputRange1& P,
                                  const InputRange2& Q,
                                  Eigen::Ref<MatrixType> transformation,
-                                 const Sampler& sampler,
+                                 const Sampler<PointType>& sampler,
                                  TransformVisitor& v) {}
 
 
@@ -266,10 +266,10 @@ protected :
     /// @param P The first input set.
     /// @param Q The second input set.
     /// @param sampler The sampler used to sample the input sets.
-    template <typename InputRange1, typename InputRange2, typename Sampler>
+    template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
     void init(const InputRange1& P,
               const InputRange2& Q,
-              const Sampler& sampler);
+              const Sampler<PointType>& sampler);
 
 private:
 

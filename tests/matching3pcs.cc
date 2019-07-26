@@ -215,7 +215,7 @@ void test_model(const vector<Transform> &transforms,
     // Our matcher.
     using MatcherType = gr::Match3pcs<gr::Point3D<float>, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
     using OptionType  = typename MatcherType::OptionsType;
-    using SamplerType   = gr::UniformDistSampler;
+    using SamplerType   = gr::UniformDistSampler<gr::Point3D<float> >;
 
 
     OptionType options;

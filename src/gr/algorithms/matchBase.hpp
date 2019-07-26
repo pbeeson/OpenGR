@@ -258,10 +258,10 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
 }
 
 template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
-template <typename InputRange1, typename InputRange2, typename Sampler>
+template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
 void MATCH_BASE_TYPE::init(const InputRange1& P,
               const InputRange2& Q,
-              const Sampler& sampler) {
+              const Sampler<PointType>& sampler) {
 
     centroid_P_ = VectorType::Zero();
     centroid_Q_ = VectorType::Zero();
@@ -273,9 +273,7 @@ void MATCH_BASE_TYPE::init(const InputRange1& P,
     if (P.size() > options_.sample_size){
         std::vector<typename InputRange1::value_type > sampled_P_3D;
 
-        // TODO: PointType needs to be passed. However, template parameter passing on
-        // overloaded operator() seems ugly.
-        sampler.template operator()<PointType>(P, options_, sampled_P_3D_);
+        sampler(P, options_, sampled_P_3D_);
     }
     else
     {
@@ -289,9 +287,7 @@ void MATCH_BASE_TYPE::init(const InputRange1& P,
     if (Q.size() > options_.sample_size){
         std::vector<typename InputRange2::value_type> uniform_Q, sampled_Q_3D;
 
-        // TODO: PointType needs to be passed. However, template parameter passing on
-        // overloaded operator() seems ugly.
-        sampler.template operator()<PointType>(Q, options_, uniform_Q);
+        sampler(Q, options_, uniform_Q);
     
         std::vector<int> indices(uniform_Q.size());
         std::iota( std::begin(indices), std::end(indices), 0 );

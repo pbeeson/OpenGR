@@ -261,7 +261,7 @@ void callMatch4SubTestsWithFunctor()
     using Scalar = typename MatcherType::Scalar;
     using PairsVector = typename MatcherType::PairsVector;
     using OptionType  = typename MatcherType::OptionsType;
-    using SamplerType = gr::UniformDistSampler;
+    using SamplerType = gr::UniformDistSampler<gr::Point3D<float> >;
 
     SamplerType sampler;
 

@@ -61,7 +61,7 @@ template <
     typename PointType,
     typename Options,
     typename Range,
-    typename Sampler,
+    template<typename> typename Sampler,
     typename TransformVisitor>
 typename PointType::Scalar computeAlignment (
     const Options& options,
@@ -69,7 +69,7 @@ typename PointType::Scalar computeAlignment (
     const Range& P,
     const Range& Q,
     Eigen::Ref<Eigen::Matrix<typename PointType::Scalar, 4, 4>> mat,
-    const Sampler& sampler,
+    const Sampler<PointType>& sampler,
     TransformVisitor& visitor
     ) {
   Matcher matcher (options, logger);
@@ -128,13 +128,12 @@ int main(int argc, char **argv) {
   typename Point3D<Scalar>::Scalar score = 0;
 
   constexpr Utils::LogLevel loglvl = Utils::Verbose;
-  using SamplerType   = gr::UniformDistSampler;
+
   using TrVisitorType = typename std::conditional <loglvl==Utils::NoLog,
                             DummyTransformVisitor,
                             TransformVisitor>::type;
   using PairFilter = gr::AdaptivePointFilter;
 
-  SamplerType sampler;
   TrVisitorType visitor;
   Utils::Logger logger(loglvl);
 
@@ -183,6 +182,8 @@ int main(int argc, char **argv) {
           using MatcherType  = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType   = typename MatcherType::OptionsType;
 
+          UniformDistSampler<PointAdapter> sampler;
+
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))
             exit(-2); /// \FIXME use status codes for error reporting
@@ -196,6 +197,8 @@ int main(int argc, char **argv) {
           using PointAdapter = extlib1::PointAdapter;
           using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
+
+          UniformDistSampler<PointAdapter> sampler;
 
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))
@@ -213,6 +216,8 @@ int main(int argc, char **argv) {
           using PointAdapter = extlib2::PointAdapter;
           using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
+
+          UniformDistSampler<PointAdapter> sampler;
 
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))
@@ -253,6 +258,8 @@ int main(int argc, char **argv) {
           using MatcherType  = gr::Match4pcsBase<gr::Functor4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType   = typename MatcherType::OptionsType;
 
+          UniformDistSampler<PointAdapter> sampler;
+
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))
             exit(-2); /// \FIXME use status codes for error reporting
@@ -266,6 +273,8 @@ int main(int argc, char **argv) {
           using PointAdapter = extlib1::PointAdapter;
           using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
+
+          UniformDistSampler<PointAdapter> sampler;
 
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))
@@ -283,6 +292,8 @@ int main(int argc, char **argv) {
           using PointAdapter = extlib2::PointAdapter;
           using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, PointAdapter, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
           using OptionType  = typename MatcherType::OptionsType;
+
+          UniformDistSampler<PointAdapter> sampler;
 
           OptionType options;
           if(! Demo::setOptionsFromArgs(options, logger))

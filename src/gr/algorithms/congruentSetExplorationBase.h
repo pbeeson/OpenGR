@@ -134,11 +134,11 @@ public:
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
     template <typename InputRange1,
               typename InputRange2,
-              typename Sampler>
+              template<typename> typename Sampler>
     Scalar ComputeTransformation(const InputRange1& P,
                                  const InputRange2& Q,
                                  Eigen::Ref<MatrixType> transformation,
-                                 const Sampler& sampler,
+                                 const Sampler<_PointType>& sampler,
                                  TransformVisitor& v);
 
     /// Tries to compute an inital base from P
