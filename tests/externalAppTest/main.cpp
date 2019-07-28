@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
   using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, gr::Point3D<float>, TrVisitor, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
   using OptionType  = typename MatcherType::OptionsType;
-  using SamplerType = gr::UniformDistSampler;
+  using SamplerType = gr::UniformDistSampler<gr::Point3D<float> >;
 
   vector<Point3D<float> > set1, set2;
   vector<Eigen::Matrix2f> tex_coords1, tex_coords2;
