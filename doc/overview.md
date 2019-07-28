@@ -24,6 +24,7 @@ In a nutshell, it provides:
  - Developping with the library:
    - @subpage compilation : Compilation instructions and supported platform(s...). Also describes how to link with the library using cmake.
    - @subpage extend : Describes how to add new registration algorithms to the library.
+   - @subpage using-your-point-type : Describes how to use your point type as input to the library.
    - @subpage tests : Monitor continuous integration, run tests on your platform
  - @subpage currentrelease : Changelog and status of the current release
  - @subpage roadmap
@@ -53,6 +54,7 @@ In a nutshell, it provides:
 * [Simone Gasparini](https://github.com/simogasp) Pull-Request reviews
 * [xinkang](https://github.com/xinkang) Fix include path of timer.h
 * [Kastan Day](https://github.com/kastanday) Added getFitnessScore() to PCL wrapper
+* [Necip Fazil Yildiran](https://github.com/necipfazil) Range and point type abstraction layer
 
 
 ### Citation
