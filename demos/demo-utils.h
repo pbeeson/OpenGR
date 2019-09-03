@@ -99,7 +99,7 @@ static double norm_diff = -1;
 // Maximum allowed computation time.
 static int max_time_seconds = 10;
 
-// Point type to use
+// Point type to use - ExtPointBinding demo
 static int point_type = 0;
 static int max_point_type = 2; // 0: gr::Point3D, 1: extlib1::PointType1, 2: extlib2::PointType2
 
@@ -113,7 +113,6 @@ static inline void printParameterList(){
     fprintf(stderr, "\t[ -a norm_diff (%f) ]\n", norm_diff);
     fprintf(stderr, "\t[ -c max_color_diff (%f) ]\n", max_color);
     fprintf(stderr, "\t[ -t max_time_seconds (%d) ]\n", max_time_seconds);
-    fprintf(stderr, "\t[ -p point_type (%d)]\n", point_type);
 }
 
 static inline void printUsage(int /*argc*/, char **argv){
