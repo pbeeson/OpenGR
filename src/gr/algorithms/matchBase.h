@@ -69,13 +69,13 @@ struct DummyTransformVisitor {
 };
 
 /// \brief Abstract class for registration algorithms
-template <typename _TransformVisitor = DummyTransformVisitor,
-          template < class, class > typename ... OptExts >
+template <typename PointType, typename _TransformVisitor = DummyTransformVisitor,
+          template < class, class > typename ... OptExts>
 class MatchBase {
 
 public:
-    using Scalar = typename Point3D::Scalar;
-    using VectorType = typename Point3D::VectorType;
+    using Scalar = typename PointType::Scalar;
+    using VectorType = typename PointType::VectorType;
     using MatrixType = Eigen::Matrix<Scalar, 4, 4>;
     using LogLevel = Utils::LogLevel;
     using TransformVisitor = _TransformVisitor;
@@ -84,7 +84,7 @@ public:
     class Options : public TBase
     {
     public:
-        using Scalar = typename Point3D::Scalar;
+        using Scalar = typename PointType::Scalar;
 
         /// Distance threshold used to compute the LCP
         /// \todo Move to DistanceMeasure
@@ -111,6 +111,24 @@ public:
 
     using OptionsType = gr::Utils::CRTP < OptExts ... , Options >;
 
+    /// A convenience class used to wrap (any) PointType to allow mutation of position
+    /// of point samples for internal computations. 
+    struct PosMutablePoint : public PointType
+    {
+        using VectorType = typename PointType::VectorType;
+        
+        private:
+            VectorType posCopy;
+        
+        public:
+            template<typename ExternalType>
+            PosMutablePoint(const ExternalType& i) 
+                : PointType(i), posCopy(PointType(i).pos()) { }
+
+            inline VectorType & pos() { return posCopy; }
+
+            inline VectorType pos() const { return posCopy; }
+    };
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -119,12 +137,12 @@ public:
     virtual ~MatchBase();
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<Point3D>& getFirstSampled() const {
+    const std::vector<PosMutablePoint>& getFirstSampled() const {
         return sampled_P_3D_;
     }
 
     /// Read access to the sampled clouds used for the registration
-    const std::vector<Point3D>& getSecondSampled() const {
+    const std::vector<PosMutablePoint>& getSecondSampled() const {
         return sampled_Q_3D_;
     }
 
@@ -138,12 +156,31 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
-    template <typename Sampler>
+/*    template <typename Sampler>
     Scalar ComputeTransformation(const std::vector<Point3D>& P,
                                  const std::vector<Point3D>& Q,
                                  Eigen::Ref<MatrixType> transformation,
                                  const Sampler& sampler,
                                  TransformVisitor& v) {}
+*/
+    /// Computes an approximation of the best LCP (directional) from Q to P
+    /// and the rigid transformation that realizes it. The input sets may or may
+    /// not contain normal information for any point.
+    /// @param [in] P The first input set.
+    /// @param [in] Q The second input set.
+    /// @param [out] transformation Rigid transformation matrix (4x4) that brings
+    /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
+    /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
+    template <typename InputRange1,
+              typename InputRange2,
+              template<typename> typename Sampler>
+    Scalar ComputeTransformation(const InputRange1& P,
+                                 const InputRange2& Q,
+                                 Eigen::Ref<MatrixType> transformation,
+                                 const Sampler<PointType>& sampler,
+                                 TransformVisitor& v) {}
+
+
 #endif
 
 protected:
@@ -160,9 +197,9 @@ protected:
     /// The transformation matrix by wich we transform Q to P
     Eigen::Matrix<Scalar, 4, 4> transform_;
     /// Sampled P (3D coordinates).
-    std::vector<Point3D> sampled_P_3D_;
+    std::vector<PosMutablePoint> sampled_P_3D_;
     /// Sampled Q (3D coordinates).
-    std::vector<Point3D> sampled_Q_3D_;
+    std::vector<PosMutablePoint> sampled_Q_3D_;
     /// The centroid of P.
     VectorType centroid_P_;
     /// The centroid of Q.
@@ -221,18 +258,19 @@ protected :
 
     /// Initializes the data structures and needed values before the match
     /// computation.
-    /// @param [in] point_P First input set.
-    /// @param [in] point_Q Second input set.
-    /// expected to be in the inliers.
     /// This method is called once the internal state of the Base class as been
     /// set.
-    virtual void Initialize(const std::vector<Point3D>& /*P*/,
-                            const std::vector<Point3D>& /*Q*/) =0;
+    virtual void Initialize() { }
 
-    template <typename Sampler>
-    void init(const std::vector<Point3D>& P,
-              const std::vector<Point3D>& Q,
-              const Sampler& sampler);
+    /// Initializes the internal state of the Base class
+    /// @param P The first input set.
+    /// @param Q The second input set.
+    /// @param sampler The sampler used to sample the input sets.
+    template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
+    void init(const InputRange1& P,
+              const InputRange2& Q,
+              const Sampler<PointType>& sampler);
+
 private:
 
     void initKdTree();

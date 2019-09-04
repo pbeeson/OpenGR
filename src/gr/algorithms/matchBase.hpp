@@ -5,6 +5,7 @@
 #include <vector>
 #include <atomic>
 #include <chrono>
+#include <numeric> // std::iota
 
 #ifdef OpenGR_USE_OPENMP
 #include <omp.h>
@@ -21,12 +22,12 @@
 #endif
 
 
-#define MATCH_BASE_TYPE MatchBase<TransformVisitor, OptExts ... >
+#define MATCH_BASE_TYPE MatchBase<PointType, TransformVisitor, OptExts ... >
 
 
 namespace gr {
 
-template <typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 MATCH_BASE_TYPE::MatchBase(const typename MATCH_BASE_TYPE::OptionsType &options,
                       const Utils::Logger& logger
                        )
@@ -37,15 +38,15 @@ MATCH_BASE_TYPE::MatchBase(const typename MATCH_BASE_TYPE::OptionsType &options,
     , options_(options)
 {}
 
-template <typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 MATCH_BASE_TYPE::~MatchBase(){}
 
 
-template <typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 typename MATCH_BASE_TYPE::Scalar
 MATCH_BASE_TYPE::MeanDistance() const {
     const Scalar kDiameterFraction = 0.2;
-    using RangeQuery = gr::KdTree<Scalar>::RangeQuery<>;
+    using RangeQuery = typename gr::KdTree<Scalar>::template RangeQuery<>;
 
     int number_of_samples = 0;
     Scalar distance = 0.0;
@@ -67,7 +68,7 @@ MATCH_BASE_TYPE::MeanDistance() const {
     return distance / number_of_samples;
 }
 
-template <typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 bool
 MATCH_BASE_TYPE::SelectRandomTriangle(int &base1, int &base2, int &base3) {
     int number_of_points = sampled_P_3D_.size();
@@ -104,7 +105,7 @@ MATCH_BASE_TYPE::SelectRandomTriangle(int &base1, int &base2, int &base3) {
     return base1 != -1 && base2 != -1 && base3 != -1;
 }
 
-template <typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 void
 MATCH_BASE_TYPE::initKdTree(){
     size_t number_of_points = sampled_P_3D_.size();
@@ -119,7 +120,7 @@ MATCH_BASE_TYPE::initKdTree(){
 }
 
 
-template <typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
 template <typename Coordinates>
 bool
 MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
@@ -138,19 +139,19 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
     // We only use the first 3 pairs. This simplifies the process considerably
     // because it is the planar case.
 
-    const VectorType& p0 = ref[0].pos();
-    const VectorType& p1 = ref[1].pos();
-    const VectorType& p2 = ref[2].pos();
-    VectorType  q0 = candidate[0].pos();
-    VectorType  q1 = candidate[1].pos();
-    VectorType  q2 = candidate[2].pos();
+    const VectorType& p0 = ref[0]->pos();
+    const VectorType& p1 = ref[1]->pos();
+    const VectorType& p2 = ref[2]->pos();
+    VectorType  q0 = candidate[0]->pos();
+    VectorType  q1 = candidate[1]->pos();
+    VectorType  q2 = candidate[2]->pos();
 
     Scalar scaleEst (1.);
 
     // Compute scale factor if needed
     if (computeScale){
-        const VectorType& p3 = ref[3].pos();
-        const VectorType& q3 = candidate[3].pos();
+        const VectorType& p3 = ref[3]->pos();
+        const VectorType& q3 = candidate[3]->pos();
 
         const Scalar ratio1 = (p1 - p0).norm() / (q1 - q0).norm();
         const Scalar ratio2 = (p3 - p2).norm() / (q3 - q2).norm();
@@ -237,9 +238,9 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
 
         //cv::Mat first(3, 1, CV_64F), transformed;
         for (int i = 0; i < 3; ++i) {
-            first = scaleEst*candidate[i].pos() - centroid2;
+            first = scaleEst*candidate[i]->pos() - centroid2;
             transformed = rotation * first;
-            rms_ += (transformed - ref[i].pos() + centroid1).norm();
+            rms_ += (transformed - ref[i]->pos() + centroid1).norm();
         }
     }
 
@@ -256,12 +257,11 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
     return true;
 }
 
-
-template <typename TransformVisitor, template < class, class > typename ... OptExts>
-template <typename Sampler>
-void MATCH_BASE_TYPE::init(const std::vector<Point3D>& P,
-                     const std::vector<Point3D>& Q,
-                     const Sampler& sampler){
+template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
+void MATCH_BASE_TYPE::init(const InputRange1& P,
+              const InputRange2& Q,
+              const Sampler<PointType>& sampler) {
 
     centroid_P_ = VectorType::Zero();
     centroid_Q_ = VectorType::Zero();
@@ -271,38 +271,49 @@ void MATCH_BASE_TYPE::init(const std::vector<Point3D>& P,
 
     // prepare P
     if (P.size() > options_.sample_size){
+        std::vector<typename InputRange1::value_type > sampled_P_3D;
+
         sampler(P, options_, sampled_P_3D_);
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(P) More samples requested than available: use whole cloud" );
-        sampled_P_3D_ = P;
+
+        // copy all the points
+        std::copy(P.begin(), P.end(), std::back_inserter(sampled_P_3D_));
     }
-
-
 
     // prepare Q
     if (Q.size() > options_.sample_size){
-        std::vector<Point3D> uniform_Q;
+        std::vector<typename InputRange2::value_type> uniform_Q, sampled_Q_3D;
+
         sampler(Q, options_, uniform_Q);
-
-
-        std::shuffle(uniform_Q.begin(), uniform_Q.end(), randomGenerator_);
+    
+        std::vector<int> indices(uniform_Q.size());
+        std::iota( std::begin(indices), std::end(indices), 0 );
+        std::shuffle(indices.begin(), indices.end(), randomGenerator_);
         size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size);
-        auto endit = uniform_Q.begin(); std::advance(endit, nbSamples );
-        std::copy(uniform_Q.begin(), endit, std::back_inserter(sampled_Q_3D_));
+        indices.resize(nbSamples);
+
+        // using the indices, copy elements from uniform_Q to sampled_P_3D_
+        for(int i : indices) 
+            sampled_Q_3D_.emplace_back(uniform_Q[i]);
+        
+        uniform_Q.clear();
     }
     else
     {
         Log<LogLevel::ErrorReport>( "(Q) More samples requested than available: use whole cloud" );
-        sampled_Q_3D_ = Q;
+        
+        // copy all the points
+        std::copy(Q.begin(), Q.end(), std::back_inserter(sampled_Q_3D_));
     }
 
 
     // center points around centroids
-    auto centerPoints = [](std::vector<Point3D>&container,
+    auto centerPoints = [](std::vector<PosMutablePoint>&container,
             VectorType& centroid){
-        for(const auto& p : container) centroid += p.pos();
+        for(auto& p : container) centroid += p.pos();
         centroid /= Scalar(container.size());
         for(auto& p : container) p.pos() -= centroid;
     };
@@ -311,6 +322,7 @@ void MATCH_BASE_TYPE::init(const std::vector<Point3D>& P,
 
 
     initKdTree();
+    
     // Compute the diameter of P approximately (randomly). This is far from being
     // Guaranteed close to the diameter but gives good results for most common
     // objects if they are densely sampled.
@@ -336,9 +348,9 @@ void MATCH_BASE_TYPE::init(const std::vector<Point3D>& P,
     transform_ = Eigen::Matrix<Scalar, 4, 4>::Identity();
 
     // call Virtual handler
-    Initialize(P,Q);
+    Initialize();
 }
 
-}
+} // namespace gr
 
 #undef MATCH_BASE_TYPE

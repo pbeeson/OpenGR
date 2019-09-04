@@ -65,7 +65,7 @@ class CongruentSetExplorationOptions : public  TBase
 {
 public:
     using Scalar = typename TBase::Scalar;
-
+    
     inline bool configureOverlap(Scalar overlap_, Scalar terminate_threshold_ = Scalar(1)) {
         if(terminate_threshold_ < overlap_) return false;
         overlap_estimation = overlap_;
@@ -88,10 +88,11 @@ private:
 /// \brief Base class for Congruent Sec Exploration algorithms
 /// \tparam _Traits Defines properties of the Base used to build the congruent set.
 template <typename _Traits,
+          typename _PointType,
           typename _TransformVisitor,
           typename _PairFilteringFunctor, /// <\brief Must implements PairFilterConcept
           template < class, class > class ... OptExts >
-class CongruentSetExplorationBase : public MatchBase<_TransformVisitor, OptExts ..., CongruentSetExplorationOptions> {
+class CongruentSetExplorationBase : public MatchBase<_PointType, _TransformVisitor, OptExts ..., CongruentSetExplorationOptions> {
 
 public:
     using Traits = _Traits;
@@ -101,8 +102,8 @@ public:
     using Coordinates = typename Traits::Coordinates;
     using PairFilteringFunctor = _PairFilteringFunctor;
 
-    using MatchBaseType = MatchBase<_TransformVisitor, OptExts ..., CongruentSetExplorationOptions>;
-
+    using MatchBaseType = MatchBase<_PointType, _TransformVisitor, OptExts ..., CongruentSetExplorationOptions>;
+    using PosMutablePoint = typename MatchBaseType::PosMutablePoint;
     using OptionsType = typename MatchBaseType::OptionsType;
 
     using PairsVector =  std::vector< std::pair<int, int> >;
@@ -131,14 +132,21 @@ public:
     /// @param [out] transformation Rigid transformation matrix (4x4) that brings
     /// Q to the (approximate) optimal LCP. Initial value is considered as a guess
     /// @return the computed LCP measure as a fraction of the size of P ([0..1]).
-    template <typename Sampler>
-    Scalar ComputeTransformation(const std::vector<Point3D>& P,
-                                 const std::vector<Point3D>& Q,
+    template <typename InputRange1,
+              typename InputRange2,
+              template<typename> typename Sampler>
+    Scalar ComputeTransformation(const InputRange1& P,
+                                 const InputRange2& Q,
                                  Eigen::Ref<MatrixType> transformation,
-                                 const Sampler& sampler,
+                                 const Sampler<_PointType>& sampler,
                                  TransformVisitor& v);
 
-
+    /// Tries to compute an inital base from P
+    /// @param [out] base The base, if found. Initial value is not used. Modified as 
+    /// the computed base if the return value is true.
+    /// @return true if a base is found an initialized, false otherwise
+    virtual bool initBase (CongruentBaseType &base) = 0;
+    
 protected:
     /// Number of trials. Every trial picks random base from P.
     int number_of_trials_;

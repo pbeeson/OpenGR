@@ -21,11 +21,8 @@ using namespace std;
 using namespace gr;
 using namespace gr::Demo;
 
-
-
 // data IO
-IOManager iomananger;
-
+IOManager ioManager;
 
 static inline void printS4PCSParameterList(){
     fprintf(stderr, "\t[ -r result_file_name (%s) ]\n", output.c_str());
@@ -52,21 +49,23 @@ struct TransformVisitor {
 
 template <
     typename Matcher,
+    typename PointType,
     typename Options,
-    typename Sampler,
+    typename Range,
+    template<typename> typename Sampler,
     typename TransformVisitor>
-typename Point3D::Scalar computeAlignment (
+typename PointType::Scalar computeAlignment (
     const Options& options,
     const Utils::Logger& logger,
-    const std::vector<Point3D>& P,
-    const std::vector<Point3D>& Q,
-    Eigen::Ref<Eigen::Matrix<typename Point3D::Scalar, 4, 4>> mat,
-    const Sampler& sampler,
+    const Range& P,
+    const Range& Q,
+    Eigen::Ref<Eigen::Matrix<typename PointType::Scalar, 4, 4>> mat,
+    const Sampler<PointType>& sampler,
     TransformVisitor& visitor
     ) {
   Matcher matcher (options, logger);
   logger.Log<Utils::Verbose>( "Starting registration" );
-  typename Point3D::Scalar score = matcher.ComputeTransformation(P, Q, mat, sampler, visitor);
+  typename PointType::Scalar score = matcher.ComputeTransformation(P, Q, mat, sampler, visitor);
 
 
   logger.Log<Utils::Verbose>( "Score: ", score );
@@ -81,10 +80,10 @@ typename Point3D::Scalar computeAlignment (
       logger.Log<Utils::Verbose>( "Exporting Sampled cloud 1 to ",
                                   outputSampled1.c_str(),
                                   " ..." );
-      iomananger.WriteObject((char *)outputSampled1.c_str(),
+      ioManager.WriteObject((char *)outputSampled1.c_str(),
                              matcher.getFirstSampled(),
                              vector<Eigen::Matrix2f>(),
-                             vector<typename Point3D::VectorType>(),
+                             vector<typename Point3D<float>::VectorType>(), // dummy
                              vector<tripple>(),
                              vector<string>());
       logger.Log<Utils::Verbose>( "Export DONE" );
@@ -93,10 +92,10 @@ typename Point3D::Scalar computeAlignment (
       logger.Log<Utils::Verbose>( "Exporting Sampled cloud 2 to ",
                                   outputSampled2.c_str(),
                                   " ..." );
-      iomananger.WriteObject((char *)outputSampled2.c_str(),
+      ioManager.WriteObject((char *)outputSampled2.c_str(),
                              matcher.getSecondSampled(),
                              vector<Eigen::Matrix2f>(),
-                             vector<typename Point3D::VectorType>(),
+                             vector<typename Point3D<float>::VectorType>(), // dummy
                              vector<tripple>(),
                              vector<string>());
       logger.Log<Utils::Verbose>( "Export DONE" );
@@ -107,31 +106,33 @@ typename Point3D::Scalar computeAlignment (
 
 int main(int argc, char **argv) {
   using namespace gr;
-
-  vector<Point3D> set1, set2;
+  using Scalar = float;
+  // Point clouds are read as gr::Point3D, then converted to other types if necessary to
+  // emulate PointAdapter usage
+  vector<Point3D<Scalar> > set1, set2;
   vector<Eigen::Matrix2f> tex_coords1, tex_coords2;
-  vector<typename Point3D::VectorType> normals1, normals2;
+  vector<typename Point3D<Scalar>::VectorType> normals1, normals2;
   vector<tripple> tris1, tris2;
   vector<std::string> mtls1, mtls2;
 
   // Match and return the score (estimated overlap or the LCP).
-  typename Point3D::Scalar score = 0;
+  typename Point3D<Scalar>::Scalar score = 0;
 
   constexpr Utils::LogLevel loglvl = Utils::Verbose;
-  using SamplerType   = gr::UniformDistSampler;
+
   using TrVisitorType = typename std::conditional <loglvl==Utils::NoLog,
                             DummyTransformVisitor,
                             TransformVisitor>::type;
   using PairFilter = gr::AdaptivePointFilter;
 
-  SamplerType sampler;
   TrVisitorType visitor;
   Utils::Logger logger(loglvl);
 
   /// TODO Add proper error codes
   if(argc < 4){
-      Demo::printUsage(argc, argv);
-      exit(-2);
+    Demo::printUsage(argc, argv);
+    printS4PCSParameterList();
+    exit(-2);
   }
   if(int c = Demo::getArgs(argc, argv) != 0)
   {
@@ -141,17 +142,17 @@ int main(int argc, char **argv) {
   }
 
   // prepare matcher ressourcesoutputSampled2
-  using MatrixType = Eigen::Matrix<typename Point3D::Scalar, 4, 4>;
+  using MatrixType = Eigen::Matrix<typename Point3D<Scalar>::Scalar, 4, 4>;
   MatrixType mat (MatrixType::Identity());
 
   // Read the inputs.
-  if (!iomananger.ReadObject((char *)input1.c_str(), set1, tex_coords1, normals1, tris1,
+  if (!ioManager.ReadObject((char *)input1.c_str(), set1, tex_coords1, normals1, tris1,
                   mtls1)) {
     logger.Log<Utils::ErrorReport>("Can't read input set1");
     exit(-1);
   }
 
-  if (!iomananger.ReadObject((char *)input2.c_str(), set2, tex_coords2, normals2, tris2,
+  if (!ioManager.ReadObject((char *)input2.c_str(), set2, tex_coords2, normals2, tris2,
                   mtls2)) {
     logger.Log<Utils::ErrorReport>("Can't read input set2");
     exit(-1);
@@ -164,33 +165,39 @@ int main(int argc, char **argv) {
     Utils::CleanInvalidNormals(set2, normals2);
 
   try {
+    if (use_super4pcs) {
+      using PointType    = gr::Point3D<Scalar>;
+      using MatcherType  = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointType, 
+                                             TrVisitorType, gr::AdaptivePointFilter,
+                                             gr::AdaptivePointFilter::Options>;
+      using OptionType   = typename MatcherType::OptionsType;
 
-      if (use_super4pcs) {
-          using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
-          using OptionType  = typename MatcherType::OptionsType;
+      UniformDistSampler<PointType> sampler;
 
-          OptionType options;
-          if(! Demo::setOptionsFromArgs(options, logger))
-          {
-            exit(-2); /// \FIXME use status codes for error reporting
-          }
+      OptionType options;
+      if(! Demo::setOptionsFromArgs(options, logger))
+        exit(-2); /// \FIXME use status codes for error reporting
 
-          score = computeAlignment<MatcherType> (options, logger, set1, set2, mat, sampler, visitor);
+      score = computeAlignment<MatcherType, PointType> (options, logger, set1, set2,
+                                                        mat, sampler, visitor);
+    }
+    else {
+      // 4PCS
+      using PointType    = gr::Point3D<Scalar>;
+      using MatcherType  = gr::Match4pcsBase<gr::Functor4PCS, PointType,
+                                             TrVisitorType, gr::AdaptivePointFilter,
+                                             gr::AdaptivePointFilter::Options>;
+      using OptionType   = typename MatcherType::OptionsType;
 
-      }
-      else {
-          using MatcherType = gr::Match4pcsBase<gr::Functor4PCS, TrVisitorType, gr::AdaptivePointFilter, gr::AdaptivePointFilter::Options>;
-          using OptionType  = typename MatcherType::OptionsType;
+      UniformDistSampler<PointType> sampler;
 
-          OptionType options;
-          if(! Demo::setOptionsFromArgs(options, logger))
-          {
-            exit(-2); /// \FIXME use status codes for error reporting
-          }
+      OptionType options;
+      if(! Demo::setOptionsFromArgs(options, logger))
+        exit(-2); /// \FIXME use status codes for error reporting
 
-          score = computeAlignment<MatcherType> (options, logger, set1, set2, mat, sampler, visitor);
-      }
-
+      score = computeAlignment<MatcherType, PointType> (options, logger, set1, set2,
+                                                        mat, sampler, visitor);
+    }
   }
   catch (const std::exception& e) {
       logger.Log<Utils::ErrorReport>( "[Error]: " , e.what() );
@@ -207,7 +214,7 @@ int main(int argc, char **argv) {
       logger.Log<Utils::Verbose>( "Exporting Matrix to ",
                                   outputMat.c_str(),
                                   "..." );
-      iomananger.WriteMatrix(outputMat, mat.cast<double>(), IOManager::POLYWORKS);
+      ioManager.WriteMatrix(outputMat, mat.cast<double>(), IOManager::POLYWORKS);
       logger.Log<Utils::Verbose>( "Export DONE" );
   }
 
@@ -217,7 +224,7 @@ int main(int argc, char **argv) {
                                   output.c_str(),
                                   "..." );
       Utils::TransformPointCloud(set2, mat);
-      iomananger.WriteObject((char *)output.c_str(),
+      ioManager.WriteObject((char *)output.c_str(),
                              set2,
                              tex_coords2,
                              normals2,

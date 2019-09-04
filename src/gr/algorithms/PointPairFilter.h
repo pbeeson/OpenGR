@@ -10,6 +10,24 @@
 
 namespace gr {
 
+#ifdef PARSED_BY_DOXYGEN
+struct PairFilterConcept {
+
+    template < class Derived, class TBase>
+    struct Options : public TBase { };
+    
+    /// Verify that the 2 points found in Q are similar to 2 of the points in the base.
+    /// Return a pair of bool, according of the right addition of the pair (p,q) or (q,p) in the congruent set.
+    template <typename PointType, typename WantedOptionsAndMore>
+    inline std::pair<bool,bool> operator() (const PointType& /*p*/,
+                                            const PointType& /*q*/,
+                                            typename PointType::Scalar /*pair_normals_angle*/,
+                                            const PointType& /*b0*/,
+                                            const PointType& /*b1*/,
+                                            const WantedOptionsAndMore& /*options*/) { }
+};
+#endif
+
     /// \brief Functor used in n-pcs algorithm to filters pairs of points according
     ///        to the exploration basis,
     /// \tparam
@@ -21,12 +39,12 @@ namespace gr {
       bool dummyFilteringResponse;
       enum { IS_DUMMYPOINTFILTER_OPTIONS = true };
     };
-    template <typename WantedOptionsAndMore>
-    inline std::pair<bool,bool> operator() (const Point3D& /*p*/,
-                                            const Point3D& /*q*/,
-                                            typename Point3D::Scalar /*pair_normals_angle*/,
-                                            const Point3D& /*b0*/,
-                                            const Point3D& /*b1*/,
+    template <typename PointType, typename WantedOptionsAndMore>
+    inline std::pair<bool,bool> operator() (const PointType& /*p*/,
+                                            const PointType& /*q*/,
+                                            typename PointType::Scalar /*pair_normals_angle*/,
+                                            const PointType& /*b0*/,
+                                            const PointType& /*b1*/,
                                             const WantedOptionsAndMore &options) {
         return std::make_pair(options.dummyFilteringResponse, options.dummyFilteringResponse);
     }
@@ -54,18 +72,18 @@ namespace gr {
         /// Verify that the 2 points found in Q are similar to 2 of the points in the base.
         /// A filter by point feature : normal, distance, translation distance, angle and color.
         /// Return a pair of bool, according of the right addition of the pair (p,q) or (q,p) in the congruent set.
-        template <typename WantedOptionsAndMore>
-        inline std::pair<bool,bool> operator() (const Point3D& p,
-                                                const Point3D& q,
-                                                typename Point3D::Scalar pair_normals_angle,
-                                                const Point3D& b0,
-                                                const Point3D& b1,
+        template <typename PointType, typename WantedOptionsAndMore>
+        inline std::pair<bool,bool> operator() (const PointType& p,
+                                                const PointType& q,
+                                                typename PointType::Scalar pair_normals_angle,
+                                                const PointType& b0,
+                                                const PointType& b1,
                                                 const WantedOptionsAndMore &options) {
             static_assert( WantedOptionsAndMore::IS_ADAPTIVEPOINTFILTER_OPTIONS,
                            "Options passed to AdaptivePointFilter must inherit AdaptivePointFilter::Options" );
-            using Scalar      = typename Point3D::Scalar;
+            using Scalar      = typename PointType::Scalar;
             using PairsVector = std::vector< std::pair<int, int> >;
-            using VectorType  = typename Point3D::VectorType;
+            using VectorType  = typename PointType::VectorType;
 
 
             std::pair<bool,bool> res;

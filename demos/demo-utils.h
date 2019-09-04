@@ -99,6 +99,10 @@ static double norm_diff = -1;
 // Maximum allowed computation time.
 static int max_time_seconds = 10;
 
+// Point type to use - ExtPointBinding demo
+static int point_type = 0;
+static int max_point_type = 2; // 0: gr::Point3D, 1: extlib1::PointType1, 2: extlib2::PointType2
+
 static bool use_super4pcs = true;
 
 static inline void printParameterList(){
@@ -146,6 +150,12 @@ static inline int getArgs(int argc,
       outputSampled1 = argv[++i];
     } else if (!strcmp(argv[i], "--sampled2")) {
       outputSampled2 = argv[++i];
+    } else if (!strcmp(argv[i], "-p")) {
+      point_type = atoi(argv[++i]);
+      if(point_type < 0 || point_type > max_point_type) {
+        std::cerr << "Invalid point type: setting to default (0)" << std::endl;
+        point_type = 0;
+      } 
     } else if (!strcmp(argv[i], "-h")) {
       return 1;
     } else if (argv[i][0] == '-') {

@@ -28,26 +28,26 @@ namespace gr {
     /// \see Match4pcsBase
     /// \tparam PairFilterFunctor filters pairs of points during the exploration.
     ///         Must implement PairFilterConcept
-    template <typename PointFilterFunctor, typename Options>
+    template <typename PointType, typename PointFilterFunctor, typename Options>
     struct FunctorSuper4PCS {
     public :
-        using BaseCoordinates = Traits4pcs::Coordinates;
-        using Scalar      = typename Point3D::Scalar;
+        using BaseCoordinates = typename Traits4pcs<PointType>::Coordinates;
+        using Scalar      = typename PointType::Scalar;
         using PairsVector = std::vector< std::pair<int, int> >;
-        using VectorType  = typename Point3D::VectorType;
+        using VectorType  = typename PointType::VectorType;
         using OptionType  = Options;
-        using PairCreationFunctorType = PairCreationFunctor<Scalar, PointFilterFunctor, OptionType>;
+        using PairCreationFunctorType = PairCreationFunctor<PointType, Scalar, PointFilterFunctor, OptionType>;
 
 
     private :
-        std::vector<Point3D> &mySampled_Q_3D_;
+        std::vector<PointType> &mySampled_Q_3D_;
         BaseCoordinates &myBase_3D_;
 
         mutable PairCreationFunctorType pcfunctor_;
 
 
     public :
-        inline FunctorSuper4PCS (std::vector<Point3D> &sampled_Q_3D_,
+        inline FunctorSuper4PCS (std::vector<PointType> &sampled_Q_3D_,
                                BaseCoordinates& base_3D_,
                                const OptionType& options)
                                 : pcfunctor_ (options,mySampled_Q_3D_)
@@ -56,11 +56,7 @@ namespace gr {
 
         /// Initializes the data structures and needed values before the match
         /// computation.
-        /// @param [in] point_P First input set.
-        /// @param [in] point_Q Second input set.
-        /// expected to be in the inliers.
-        inline void Initialize(const std::vector<Point3D>& /*P*/,
-                                   const std::vector<Point3D>& /*Q*/) {
+        inline void Initialize() {
             pcfunctor_.synch3DContent();
         }
 
@@ -134,7 +130,7 @@ namespace gr {
                 Scalar distance_threshold2,
                 const std::vector<std::pair<int, int>>& First_pairs,
                 const std::vector<std::pair<int, int>>& Second_pairs,
-               Traits4pcs::Set* quadrilaterals) const {
+               typename Traits4pcs<PointType>::Set* quadrilaterals) const {
 
             typedef typename PairCreationFunctorType::Point Point;
 
@@ -156,8 +152,8 @@ namespace gr {
 
             // Compute the angle formed by the two vectors of the basis
             const Scalar alpha =
-                    (myBase_3D_[1].pos() - myBase_3D_[0].pos()).normalized().dot(
-                            (myBase_3D_[3].pos() - myBase_3D_[2].pos()).normalized());
+                    (myBase_3D_[1]->pos() - myBase_3D_[0]->pos()).normalized().dot(
+                            (myBase_3D_[3]->pos() - myBase_3D_[2]->pos()).normalized());
 
             // 1. Datastructure construction
             const Scalar eps = pcfunctor_.getNormalizedEpsilon(distance_threshold2);

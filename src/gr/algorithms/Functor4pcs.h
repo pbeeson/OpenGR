@@ -14,24 +14,24 @@ namespace gr {
     /// \see Match4pcsBase
     /// \tparam PairFilterFunctor filters pairs of points during the exploration.
     ///         Must implement PairFilterConcept
-    template <typename PairFilterFunctor, typename Options>
+    template <typename PointType, typename PairFilterFunctor, typename Options>
     struct Functor4PCS {
     public :
-        using BaseCoordinates = Traits4pcs::Coordinates;
-        using Scalar      = typename Point3D::Scalar;
+        using BaseCoordinates = typename Traits4pcs<PointType>::Coordinates;
+        using Scalar      = typename PointType::Scalar;
         using PairsVector = std::vector< std::pair<int, int> >;
-        using VectorType  = typename Point3D::VectorType;
+        using VectorType  = typename PointType::VectorType;
         using OptionType  = Options;
 
 
     private :
         OptionType myOptions_;
-        std::vector<Point3D>& mySampled_Q_3D_;
+        std::vector<PointType>& mySampled_Q_3D_;
         BaseCoordinates &myBase_3D_;
 
 
     public :
-        inline Functor4PCS(std::vector<Point3D> &sampled_Q_3D_,
+        inline Functor4PCS(std::vector<PointType> &sampled_Q_3D_,
                          BaseCoordinates& base_3D_,
                          const OptionType &options)
                         :mySampled_Q_3D_(sampled_Q_3D_)
@@ -40,11 +40,7 @@ namespace gr {
 
         /// Initializes the data structures and needed values before the match
         /// computation.
-        /// @param [in] point_P First input set.
-        /// @param [in] point_Q Second input set.
-        /// expected to be in the inliers.
-        inline void Initialize(const std::vector<Point3D>& /*P*/,
-                                   const std::vector<Point3D>& /*Q*/) {}
+        inline void Initialize() {}
 
         /// Finds congruent candidates in the set Q, given the invariants and threshold distances.
         /// Returns true if a non empty set can be found, false otherwise.
@@ -66,7 +62,7 @@ namespace gr {
                                          Scalar distance_threshold2,
                                          const std::vector <std::pair<int, int>> &First_pairs,
                                          const std::vector <std::pair<int, int>> &Second_pairs,
-                                         Traits4pcs::Set* quadrilaterals) const {
+                                         typename Traits4pcs<PointType>::Set* quadrilaterals) const {
             using RangeQuery = typename gr::KdTree<Scalar>::template RangeQuery<>;
 
             if (quadrilaterals == nullptr) return false;
@@ -139,9 +135,9 @@ namespace gr {
 
             // Go over all ordered pairs in Q.
             for (size_t j = 0; j < mySampled_Q_3D_.size(); ++j) {
-                const Point3D& p = mySampled_Q_3D_[j];
+                const PointType& p = mySampled_Q_3D_[j];
                 for (size_t i = j + 1; i < mySampled_Q_3D_.size(); ++i) {
-                    const Point3D& q = mySampled_Q_3D_[i];
+                    const PointType& q = mySampled_Q_3D_[i];
 #ifndef MULTISCALE
                     // Compute the distance and two normal angles to ensure working with
                     // wrong orientation. We want to verify that the angle between the
@@ -152,7 +148,7 @@ namespace gr {
                     if (std::abs(distance - pair_distance) > pair_distance_epsilon) continue;
 #endif
 
-                    std::pair<bool,bool> res = fun(p,q, pair_normals_angle, myBase_3D_[base_point1],myBase_3D_[base_point2], myOptions_);
+                    std::pair<bool,bool> res = fun(p,q, pair_normals_angle, *myBase_3D_[base_point1],*myBase_3D_[base_point2], myOptions_);
                     if (res.first)
                         pairs->emplace_back(i, j);
                     if (res.second)

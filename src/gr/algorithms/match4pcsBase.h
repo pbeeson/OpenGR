@@ -22,25 +22,27 @@
 #endif
 
 namespace gr {
-
+    template <typename PointType>
     struct Traits4pcs {
         static constexpr int size() { return 4; }
         using Base = std::array<int,4>;
         using Set = std::vector<Base>;
-        using Coordinates = std::array<Point3D, 4>;
+        using Coordinates = std::array<const PointType*, 4>;
     };
 
     /// Class for the computation of the 4PCS algorithm.
     /// \param Functor use to determinate the use of Super4pcs or 4pcs algorithm.
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename _PointType,
               typename _TransformVisitor,
               typename _PairFilteringFunctor,  /// <\brief Must implements PairFilterConcept
               template < class, class > typename PairFilteringOptions >
-    class Match4pcsBase : public CongruentSetExplorationBase<Traits4pcs, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
+    class Match4pcsBase : public CongruentSetExplorationBase<Traits4pcs<typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
     public:
-        using Scalar            = typename Point3D::Scalar;
+        using Scalar            = typename _PointType::Scalar;
         using PairFilteringFunctor = _PairFilteringFunctor;
-        using MatchBaseType     = CongruentSetExplorationBase<Traits4pcs, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
+        using PosMutablePoint   = typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint;
+        using MatchBaseType     = CongruentSetExplorationBase<Traits4pcs<PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
         using VectorType        = typename MatchBaseType::VectorType;
         using MatrixType        = typename MatchBaseType::MatrixType;
         using TransformVisitor  = typename MatchBaseType::TransformVisitor;
@@ -48,7 +50,7 @@ namespace gr {
         using Set               = typename MatchBaseType::Set;
         using Coordinates       = typename MatchBaseType::Coordinates;
         using OptionsType       = typename MatchBaseType::OptionsType;
-        using Functor           = _Functor<PairFilteringFunctor, OptionsType>;
+        using Functor           = _Functor<PosMutablePoint, PairFilteringFunctor, OptionsType>;
 
     protected:
         Functor fun_;
@@ -81,13 +83,9 @@ namespace gr {
 
         /// Initializes the data structures and needed values before the match
         /// computation.
-        /// @param [in] point_P First input set.
-        /// @param [in] point_Q Second input set.
-        /// expected to be in the inliers.
         /// This method is called once the internal state of the Base class as been
         /// set.
-        void Initialize(const std::vector<Point3D>& /*P*/,
-                        const std::vector<Point3D>& /*Q*/) override;
+        void Initialize() override;
 
         /// Find all the congruent set similar to the base in the second 3D model (Q).
         /// It could be with a 3 point base or a 4 point base.
@@ -95,10 +93,18 @@ namespace gr {
         /// \param congruent_set a set of all point congruent found in Q.
         bool generateCongruents (CongruentBaseType& base,Set& congruent_quads) override;
 
+        /// Tries to compute an inital base from P
+        /// @param [out] base The base, if found. Initial value is not used. Modified as 
+        /// the computed base if the return value is true.
+        /// @return true if a base is found an initialized, false otherwise
+        bool initBase(CongruentBaseType &base) override;
+
     private:
         static inline Scalar distSegmentToSegment( const VectorType& p1, const VectorType& p2,
                                                    const VectorType& q1, const VectorType& q2,
                                                    Scalar& invariant1, Scalar& invariant2);
+
+        bool initBase(CongruentBaseType &base, Scalar& invariant1, Scalar& invariant2);
     };
 }
 

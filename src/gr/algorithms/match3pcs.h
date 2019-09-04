@@ -16,20 +16,23 @@
 #endif
 
 namespace gr {
+    template <typename PointType>
     struct Traits3pcs {
         static constexpr int size() { return 3; }
-        using Base = std::array<int,3>;
+        using Base = std::array<int,3>; 
         using Set = std::vector<Base>;
-        using Coordinates = std::array<Point3D, 3>;
+        using Coordinates = std::array<const PointType*, 3>;
     };
 
     /// Class for the computation of the 3PCS algorithm.
-    template <typename _TransformVisitor,
+    template <typename _PointType,
+              typename _TransformVisitor,
               typename _PairFilteringFunctor,  /// <\brief Must implements PairFilterConcept
               template < class, class > typename PairFilteringOptions >
-    class Match3pcs : public CongruentSetExplorationBase<Traits3pcs, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
+    class Match3pcs : public CongruentSetExplorationBase<Traits3pcs<typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
     public:
-      using Traits               = Traits3pcs;
+      using PosMutablePoint      = typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint;
+      using Traits               = Traits3pcs<PosMutablePoint>;
       using PairFilteringFunctor = _PairFilteringFunctor;
       using TransformVisitor     = _TransformVisitor;
 
@@ -37,7 +40,7 @@ namespace gr {
       using Set                  = typename Traits::Set;
       using Coordinates          = typename Traits::Coordinates;
 
-      using MatchBaseType = CongruentSetExplorationBase<Traits3pcs, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
+      using MatchBaseType = CongruentSetExplorationBase<Traits3pcs<PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions>;
 
       using OptionsType = typename MatchBaseType::OptionsType;
       using Scalar      = typename MatchBaseType::Scalar;
@@ -53,17 +56,11 @@ namespace gr {
         /// \param congruent_set a set of all point congruent found in Q.
         bool generateCongruents (CongruentBaseType& base, Set& congruent_quads) override;
 
-        /// Initializes the data structures and needed values before the match
-        /// computation.
-        /// @param [in] point_P First input set.
-        /// @param [in] point_Q Second input set.
-        /// expected to be in the inliers.
-        /// This method is called once the internal state of the Base class as been
-        /// set.
-        void Initialize(const std::vector<Point3D>& /*P*/,
-                        const std::vector<Point3D>& /*Q*/) override {}
-
-
+        /// Tries to compute an inital base from P
+        /// @param [out] base The base, if found. Initial value is not used. Modified as 
+        /// the computed base if the return value is true.
+        /// @return true if a base is found an initialized, false otherwise
+        bool initBase(CongruentBaseType &base) override;
     };
 }
 

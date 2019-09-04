@@ -12,7 +12,7 @@ typedef enum {
 static const unsigned int MAX_COMMENT_SIZE = 256;
 
 
-unsigned int
+inline unsigned int
 readHeader ( const char *filename,
              unsigned int & numOfVertices,
              unsigned int & numOfFaces,
@@ -153,7 +153,7 @@ almostsafefscanf ( FILE * stream, const char * format, Args&&... args ){
     return (count == targetCount);
 }
 
-
+template<typename Scalar>
 bool
 readBinary1Body (const std::string & filename,
                  unsigned int headerSize,
@@ -162,8 +162,8 @@ readBinary1Body (const std::string & filename,
                  unsigned int numOfVertexProperties,
                  bool         haveColor,
                  bool bigEndian,
-                 std::vector<gr::Point3D>& vertex,
-                 std::vector<typename gr::Point3D::VectorType>& normal,
+                 std::vector<gr::Point3D<Scalar> >& vertex,
+                 std::vector<typename gr::Point3D<Scalar>::VectorType>& normal,
                  std::vector<tripple>& face )
 {
     using namespace std;
@@ -183,8 +183,8 @@ readBinary1Body (const std::string & filename,
     // *****************
     // Reading geometry.
     // *****************
-    typename Point3D::VectorType n;
-    typename Point3D::VectorType rgb;
+    typename Point3D<Scalar>::VectorType n;
+    typename Point3D<Scalar>::VectorType rgb;
     float * v = new float[numOfVertexProperties];
     unsigned char rgb_buff [4];
 
@@ -253,7 +253,7 @@ readBinary1Body (const std::string & filename,
     return true;
 }
 
-
+template<typename Scalar>
 bool
 readASCII1Body (const std::string & filename,
                 unsigned int headerSize,
@@ -261,8 +261,8 @@ readASCII1Body (const std::string & filename,
                 unsigned int numOfFaces,
                 unsigned int numOfVertexProperties,
                 bool         haveColor,
-                std::vector<gr::Point3D>& vertex,
-                std::vector<typename gr::Point3D::VectorType>& normal,
+                std::vector<gr::Point3D<Scalar> >& vertex,
+                std::vector<typename gr::Point3D<Scalar>::VectorType>& normal,
                 std::vector<tripple>& face )
 {
     using namespace std;
@@ -282,8 +282,8 @@ readASCII1Body (const std::string & filename,
     // *****************
     // Reading geometry.
     // *****************
-    typename Point3D::VectorType n;
-    typename Point3D::VectorType rgb;
+    typename Point3D<Scalar>::VectorType n;
+    typename Point3D<Scalar>::VectorType rgb;
     unsigned int rgb_buff [4];
     for (unsigned int i = 0; i < numOfVertices && !feof (in); i++) {
         std::vector<float> v(numOfVertexProperties);
@@ -356,6 +356,46 @@ readASCII1Body (const std::string & filename,
     }
 
     return true;
+}
+
+template<typename Scalar>
+bool
+IOManager::ReadPly(const char *filename,
+                   vector<Point3D<Scalar> > &v,
+                   vector<typename Point3D<Scalar>::VectorType> &normals){
+
+  vector<tripple> face;
+  unsigned int numOfVertexProperties, numOfVertices, numOfFaces;
+  PLYFormat format;
+  bool haveColor;
+  unsigned int headerSize = readHeader (filename,
+                                        numOfVertices,
+                                        numOfFaces,
+                                        format,
+                                        numOfVertexProperties,
+                                        haveColor);
+  if (haveColor)
+    cout << "haveColor" << endl;
+  if (headerSize != 0){
+    if (format == BINARY_BIG_ENDIAN_1)
+      return readBinary1Body<Scalar> (filename, headerSize, numOfVertices,
+                       numOfFaces,
+                       numOfVertexProperties, haveColor, true, v, normals, face );
+    else if (format == BINARY_LITTLE_ENDIAN_1)
+      return readBinary1Body<Scalar> (filename, headerSize, numOfVertices,
+                       numOfFaces,
+                       numOfVertexProperties, haveColor, false, v, normals, face );
+    else if (format == ASCII_1)
+      return readASCII1Body<Scalar> ( filename, headerSize, numOfVertices,
+                       numOfFaces,
+                       numOfVertexProperties, haveColor, v, normals, face );
+    else{
+      cerr << "(PLY) no support for this PLY format" << endl;
+      return false;
+    }
+  }
+
+  return false;
 }
 
 #endif //IO_PLY_H

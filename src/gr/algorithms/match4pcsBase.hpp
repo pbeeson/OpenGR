@@ -26,30 +26,33 @@
 
 
 namespace gr {
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::Match4pcsBase (const OptionsType& options
+    Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Match4pcsBase (const OptionsType& options
             , const Utils::Logger& logger)
             : MatchBaseType(options,logger)
             , fun_(MatchBaseType::sampled_Q_3D_,MatchBaseType::base_3D_,MatchBaseType::options_)
     {
     }
 
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::~Match4pcsBase() {}
+    Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::~Match4pcsBase() {}
 
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    bool Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::TryQuadrilateral(
-        typename Point3D::Scalar &invariant1,
-        typename Point3D::Scalar &invariant2,
+    bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::TryQuadrilateral(
+        typename PointType::Scalar &invariant1,
+        typename PointType::Scalar &invariant2,
         int &id1, int &id2, int &id3, int &id4) {
 
         Scalar min_distance = std::numeric_limits<Scalar>::max();
@@ -67,8 +70,8 @@ namespace gr {
                 // Compute the closest points on both segments, the corresponding
                 // invariants and the distance between the closest points.
                 Scalar segment_distance = distSegmentToSegment(
-                        MatchBaseType::base_3D_[i].pos(), MatchBaseType::base_3D_[j].pos(),
-                        MatchBaseType::base_3D_[k].pos(), MatchBaseType::base_3D_[l].pos(),
+                        MatchBaseType::base_3D_[i]->pos(), MatchBaseType::base_3D_[j]->pos(),
+                        MatchBaseType::base_3D_[k]->pos(), MatchBaseType::base_3D_[l]->pos(),
                         local_invariant1, local_invariant2);
                 // Retail the smallest distance and the best order so far.
                 if (segment_distance < min_distance) {
@@ -100,11 +103,12 @@ namespace gr {
         return true;
     }
 
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    bool Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::SelectQuadrilateral(
+    bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::SelectQuadrilateral(
         Scalar &invariant1,
         Scalar &invariant2,
         int& base1, int& base2, int& base3, int& base4)  {
@@ -119,21 +123,21 @@ namespace gr {
                 return false;
             }
 
-            const auto& b0 = MatchBaseType::base_3D_[0] = MatchBaseType::sampled_P_3D_[base1];
-            const auto& b1 = MatchBaseType::base_3D_[1] = MatchBaseType::sampled_P_3D_[base2];
-            const auto& b2 = MatchBaseType::base_3D_[2] = MatchBaseType::sampled_P_3D_[base3];
+            const auto& b0 = *(MatchBaseType::base_3D_[0] = &MatchBaseType::sampled_P_3D_[base1]);
+            const auto& b1 = *(MatchBaseType::base_3D_[1] = &MatchBaseType::sampled_P_3D_[base2]);
+            const auto& b2 = *(MatchBaseType::base_3D_[2] = &MatchBaseType::sampled_P_3D_[base3]);
 
             // The 4th point will be a one that is close to be planar to the other 3
             // while still not too close to them.
-            const double x1 = b0.x();
-            const double y1 = b0.y();
-            const double z1 = b0.z();
-            const double x2 = b1.x();
-            const double y2 = b1.y();
-            const double z2 = b1.z();
-            const double x3 = b2.x();
-            const double y3 = b2.y();
-            const double z3 = b2.z();
+            const double x1 = b0.pos()(0);
+            const double y1 = b0.pos()(1);
+            const double z1 = b0.pos()(2);
+            const double x2 = b1.pos()(0);
+            const double y2 = b1.pos()(1);
+            const double z2 = b1.pos()(2);
+            const double x3 = b2.pos()(0);
+            const double y3 = b2.pos()(1);
+            const double z3 = b2.pos()(2);
 
             // Fit a plan.
             Scalar denom = (-x3 * y2 * z1 + x2 * y3 * z1 + x3 * y1 * z2 - x1 * y3 * z2 -
@@ -157,7 +161,7 @@ namespace gr {
                         (p.pos() - b2.pos()).squaredNorm() >= too_small) {
                         // Not too close to any of the first 3.
                         const Scalar distance =
-                                std::abs(A * p.x() + B * p.y() + C * p.z() - 1.0);
+                                std::abs(A * p.pos()(0) + B * p.pos()(1) + C * p.pos()(2) - 1.0);
                         // Search for the most planar.
                         if (distance < best_distance) {
                             best_distance = distance;
@@ -167,7 +171,7 @@ namespace gr {
                 }
                 // If we have a good one we can quit.
                 if (base4 != -1) {
-                    MatchBaseType::base_3D_[3] = MatchBaseType::sampled_P_3D_[base4];
+                    MatchBaseType::base_3D_[3] = &MatchBaseType::sampled_P_3D_[base4];
                     if(TryQuadrilateral(invariant1, invariant2, base1, base2, base3, base4))
                         return true;
                 }
@@ -179,62 +183,34 @@ namespace gr {
         return false;
     }
 
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
     // Initialize all internal data structures and data members.
-    void Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::Initialize(
-        const std::vector<Point3D>& P,
-        const std::vector<Point3D>& Q) {
-        fun_.Initialize(P,Q);
+    void Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Initialize() {
+        fun_.Initialize();
     }
 
 
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    bool Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (
+    bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (
         CongruentBaseType &base, Set& congruent_quads) {
 //      std::cout << "------------------" << std::endl;
+        Scalar invariant1, invariant2;
 
-      Scalar invariant1, invariant2;
-//#define STATIC_BASE
+        if(!initBase(base, invariant1, invariant2)) return false;
 
-#ifdef STATIC_BASE
-  static bool first_time = true;
-
-  if (first_time){
-      std::cerr << "Warning: Running with static base" << std::endl;
-      base[0] = 0;
-      base[1] = 3;
-      base[2] = 1;
-      base[3] = 4;
-
-      MatchBaseType::base_3D_[0] = MatchBaseType::sampled_P_3D_ [base[0]];
-      MatchBaseType::base_3D_[1] = MatchBaseType::sampled_P_3D_ [base[1]];
-      MatchBaseType::base_3D_[2] = MatchBaseType::sampled_P_3D_ [base[2]];
-      MatchBaseType::base_3D_[3] = MatchBaseType::sampled_P_3D_ [base[3]];
-      TryQuadrilateral(invariant1, invariant2, base[0], base[1], base[2], base[3]);
-
-      first_time = false;
-  }
-  else
-      return false;
-
-#else
-        if (!SelectQuadrilateral(invariant1, invariant2, base[0], base[1],
-                                 base[2], base[3])) {
-//            std::cout << "Skipping wrong base" << std::endl;
-            return false;
-        }
-#endif
 //        std::cout << "Found a new base !" << std::endl;
-        const auto& b0 = MatchBaseType::base_3D_[0];
-        const auto& b1 = MatchBaseType::base_3D_[1];
-        const auto& b2 = MatchBaseType::base_3D_[2];
-        const auto& b3 = MatchBaseType::base_3D_[3];
+        const auto& b0 = *MatchBaseType::base_3D_[0];
+        const auto& b1 = *MatchBaseType::base_3D_[1];
+        const auto& b2 = *MatchBaseType::base_3D_[2];
+        const auto& b3 = *MatchBaseType::base_3D_[3];
 
         // Computes distance between pairs.
         const Scalar distance1 = (b0.pos()- b1.pos()).norm();
@@ -271,12 +247,64 @@ namespace gr {
         return true;
     }
 
-    template <template <typename, typename> typename _Functor,
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
               template < class, class > typename PFO>
-    typename Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::Scalar
-    Match4pcsBase<_Functor, TransformVisitor, PairFilteringFunctor, PFO>::distSegmentToSegment(
+    bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base)
+    {
+        Scalar invariant1, invariant2; // dummy
+
+        return initBase(base, invariant1, invariant2);
+    }
+
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
+              typename TransformVisitor,
+              typename PairFilteringFunctor,
+              template < class, class > typename PFO>
+    bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base, Scalar& invariant1, Scalar& invariant2)
+    {
+        #ifdef STATIC_BASE
+        static bool first_time = true;
+
+        if (first_time){
+            std::cerr << "Warning: Running with static base" << std::endl;
+            base[0] = 0;
+            base[1] = 3;
+            base[2] = 1;
+            base[3] = 4;
+
+            MatchBaseType::base_3D_[0] = &MatchBaseType::sampled_P_3D_ [base[0]];
+            MatchBaseType::base_3D_[1] = &MatchBaseType::sampled_P_3D_ [base[1]];
+            MatchBaseType::base_3D_[2] = &MatchBaseType::sampled_P_3D_ [base[2]];
+            MatchBaseType::base_3D_[3] = &MatchBaseType::sampled_P_3D_ [base[3]];
+            TryQuadrilateral(invariant1, invariant2, base[0], base[1], base[2], base[3]);
+
+            first_time = false;
+        }
+        else
+            return false;
+
+        #else
+            if (!SelectQuadrilateral(invariant1, invariant2, base[0], base[1], base[2], base[3])) {
+                // std::cout << "Skipping wrong base" << std::endl;
+                return false;
+            }
+        #endif
+
+        return true;
+    }
+
+
+    template <template <typename, typename, typename> typename _Functor,
+              typename PointType,
+              typename TransformVisitor,
+              typename PairFilteringFunctor,
+              template < class, class > typename PFO>
+    typename Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Scalar
+    Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::distSegmentToSegment(
         const VectorType& p1, const VectorType& p2,
         const VectorType& q1, const VectorType& q2,
         Scalar& invariant1, Scalar& invariant2) {

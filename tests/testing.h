@@ -90,8 +90,8 @@ public:
 
     template < typename Sampler>
     inline Scalar
-    ComputeTransformation(const std::vector<Point3D>& P,
-                          std::vector<Point3D>* Q,
+    ComputeTransformation(const std::vector<Point3D<float> >& P,
+                          std::vector<Point3D<float> >* Q,
                           Eigen::Ref<MatrixType> transformation,
                           const Sampler& s,
                           TransformVisitor& v ){
@@ -102,8 +102,8 @@ public:
     }
 
     template < typename Sampler >
-    inline void init(const std::vector<Point3D>& P,
-                     const std::vector<Point3D>& Q,
+    inline void init(const std::vector<Point3D<float> >& P,
+                     const std::vector<Point3D<float> >& Q,
                      const Sampler& sampler )
     { MatchBaseType::init(P,Q, sampler); }
 
@@ -115,7 +115,7 @@ public:
                                                 base1, base2, base3, base4);
     }
 
-    inline const std::vector<Point3D>& base3D() const
+    inline const std::vector<Point3D<float> >& base3D() const
     { return MatchBaseType::base3D(); }
 
     inline bool TryCongruentSet(int base_id1,
@@ -132,14 +132,14 @@ public:
 
 
 static inline void
-generateSphereCloud (std::vector<Point3D>& cloud,
+generateSphereCloud (std::vector<Point3D<float>>& cloud,
                      size_t len){
   cloud.resize(len);
   for(auto& p : cloud)
   {
-    typename Point3D::VectorType eigenpos =
-             Point3D::VectorType::Random().normalized();
-    p = Point3D(eigenpos);
+    typename Point3D<float>::VectorType eigenpos =
+             Point3D<float>::VectorType::Random().normalized();
+    p = Point3D<float>(eigenpos);
     p.normalize();
   }
 }
@@ -150,7 +150,7 @@ template <typename Scalar, typename PairsVector>
 static inline void
 extractPairs( Scalar pair_distance,
               Scalar pair_distance_epsilon,
-              const std::vector<Point3D>& cloud,
+              const std::vector<Point3D<float> >& cloud,
               PairsVector& pairs){
     pairs.clear();
     pairs.reserve(2 * cloud.size());

@@ -39,27 +39,35 @@ public:
 
 public:
   // Obj read/write simple functions.
+  template<typename Scalar>
   bool ReadObject(const char *name,
-                  std::vector<gr::Point3D> &v,
+                  std::vector<gr::Point3D<Scalar> > &v,
                   std::vector<Eigen::Matrix2f> &tex_coords,
-                  std::vector<typename gr::Point3D::VectorType> &normals,
+                  std::vector<typename gr::Point3D<Scalar>::VectorType> &normals,
                   std::vector<tripple> &tris,
-                  std::vector<std::string> &mtls);
+                  std::vector<std::string> &mtls);           
+
+  template<typename PointRange,
+           typename TextCoordRange,
+           typename NormalRange,
+           typename TrisRange,
+           typename MTLSRange>
   bool WriteObject(const char *name,
-                   const std::vector<gr::Point3D> &v,
-                   const std::vector<Eigen::Matrix2f> &tex_coords,
-                   const std::vector<typename gr::Point3D::VectorType> &normals,
-                   const std::vector<tripple> &tris,
-                   const std::vector<std::string> &mtls);
+                   const PointRange &v,
+                   const TextCoordRange &tex_coords,
+                   const NormalRange &normals,
+                   const TrisRange &tris,
+                   const MTLSRange &mtls);
 
   bool WriteMatrix(const std::string& name,
                    const Eigen::Ref<const Eigen::Matrix<double, 4, 4> >& mat,
                    MATRIX_MODE mode);
 private:
+  template<typename Scalar>
   bool
   ReadPly(const char *name,
-          std::vector<gr::Point3D> &v,
-          std::vector<typename gr::Point3D::VectorType> &normals);
+          std::vector<gr::Point3D<Scalar> > &v,
+          std::vector<typename gr::Point3D<Scalar>::VectorType> &normals);
 
   /*!
    * \brief ReadPtx
@@ -72,31 +80,39 @@ private:
    * Implementation inspired by
    *            http://github.com/adasta/pcl_io_extra/blob/master/src/ptx_io.cpp
    */
+  template<typename Scalar>
   bool
   ReadPtx(const char *name,
-          std::vector<gr::Point3D> &v);
+          std::vector<gr::Point3D<Scalar> > &v);
 
+  template<typename Scalar>
   bool
   ReadObj(const char *name,
-          std::vector<gr::Point3D> &v,
+          std::vector<gr::Point3D<Scalar> > &v,
           std::vector<Eigen::Matrix2f> &tex_coords,
-          std::vector<typename gr::Point3D::VectorType> &normals,
+          std::vector<typename gr::Point3D<Scalar>::VectorType> &normals,
           std::vector<tripple> &tris,
           std::vector<std::string> &mtls);
 
+  template<typename PointRange, typename NormalRange>
   bool
   WritePly(std::string name,
-           const std::vector<gr::Point3D> &v,
-           const std::vector<typename gr::Point3D::VectorType> &normals);
+           const PointRange &v,
+           const NormalRange &normals);
 
+  template<typename PointRange,
+           typename TexCoordRange,
+           typename NormalRange,
+           typename TrisRange,
+           typename MTLSRange>
   bool
   WriteObj(std::string name,
-           const std::vector<gr::Point3D> &v,
-           const std::vector<Eigen::Matrix2f> &tex_coords,
-           const std::vector<typename gr::Point3D::VectorType> &normals,
-           const std::vector<tripple> &tris, const std::vector<std::string> &mtls);
-
-
+           const PointRange &v,
+           const TexCoordRange &tex_coords,
+           const NormalRange &normals,
+           const TrisRange &tris,
+           const MTLSRange &mtls);
+           
   /*!
    * \brief formatPolyworksMatrix Format 4x4 matrice so it can be loaded by polyworks
    * \param mat
@@ -106,6 +122,22 @@ private:
   std::ofstream &
   formatPolyworksMatrix(const Eigen::Ref<const Eigen::Matrix<double, 4, 4> >& mat,
                         std::ofstream &sstr);
+
+  /// Wrapped STBI functions to be used inside template methods
+  /// Limits dependency on stb just to compilation of the library by compiling
+  /// required stbi methods to object files at library compilation.
+  unsigned char*
+  stbi_load_(char const *filename, int *x, int *y, int *comp, int req_comp);
+
+  void
+  stbi_image_free_(void *retval_from_stbi_load);
+  
+  const char *
+  stbi_failure_reason_(void);
+
+  static const int STBI_rgb = 3;
 }; // class IOMananger
 
+#include "io.hpp"
+#include "io_ply.h"
 #endif // IO_H

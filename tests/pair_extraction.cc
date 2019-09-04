@@ -254,14 +254,14 @@ void callSubTests()
     }
 }
 
-template <template <typename, typename> typename FunctorType>
+template <template <typename, typename, typename> typename FunctorType>
 void callMatch4SubTestsWithFunctor()
 {
-    using MatcherType = gr::Match4pcsBase<FunctorType, TrVisitorType, gr::DummyPointFilter, gr::DummyPointFilter::Options>;
+    using MatcherType = gr::Match4pcsBase<FunctorType, gr::Point3D<float>, TrVisitorType, gr::DummyPointFilter, gr::DummyPointFilter::Options>;
     using Scalar = typename MatcherType::Scalar;
     using PairsVector = typename MatcherType::PairsVector;
     using OptionType  = typename MatcherType::OptionsType;
-    using SamplerType = gr::UniformDistSampler;
+    using SamplerType = gr::UniformDistSampler<gr::Point3D<float> >;
 
     SamplerType sampler;
 
@@ -285,7 +285,7 @@ void callMatch4SubTestsWithFunctor()
     {
 
         // generate input point cloud
-        std::vector<Point3D> P, Q;
+        std::vector<Point3D<float> > P, Q;
         Testing::generateSphereCloud(P, nbPointP);
         Testing::generateSphereCloud(Q, nbPointQ);
 
@@ -300,6 +300,9 @@ void callMatch4SubTestsWithFunctor()
         // extract point using matcher
         Testing::TestMatcher<MatcherType> match (opt, logger);
         match.init(P, Q, sampler);
+        // Init base (not interested in what base is, therefore, use dummy ref)
+        typename MatcherType::CongruentBaseType dummy;
+        match.initBase(dummy);
 
         std::vector<std::pair<int, int>> pairs1, pairs2;
         match.getFunctor().ExtractPairs(distance1,
