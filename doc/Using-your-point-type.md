@@ -8,56 +8,71 @@ In the other case, if the type of the input point instances provides the require
 
 Internally, OpenGR uses Eigen for computation, vector representation and vectorization. Therefore, it expects gr::PointConcept::VectorType to be compatible with Eigen::DenseBase, as apparent in gr::PointConcept. To use existing point types without requiring any memory duplication while complying with this requirement, Eigen::Map could be used to map data of existing point types as an Eigen matrix or vector.
 
-Following example shows a simple point type class demonstrating a possible point type external to OpenGR, and an adapter for the point type that allows OpenGR to work on the instances of this point type, without needing any duplication of data while complying with the required interface of the point type concept: gr::PointConcept.
-
-```{.cpp}
-#include <Eigen/Core>
-
-namespace extlib
-{
-  // Some external point type
-  struct PointType {
-    float* posBuffer;   // position buffer
-    float* nBuffer;     // normal buffer
-    float* colorBuffer; // color buffer
-    int id;             // id (or index)
-  };
-}
-
-// Adapter for extlib::PointType, implements gr::PointConcept
-struct PointAdapter {
-  public:
-    // Required
-    enum {Dim = 3};
-
-    // Required
-    typedef float Scalar;
-
-    // Required
-    typedef Eigen::Matrix<Scalar, Dim, 1> VectorType;
-  
-  private:
-    // Hold mapping information instead of copying underlying data 
-    // to avoid unnecessary memory duplicates.
-    Eigen::Map< const VectorType > m_pos, m_normal, m_color;
-  
-  public:
-    // Required
-    inline PointAdapter(const extlib::PointType& p)
-      : m_pos   (Eigen::Map< const VectorType >( p.posBuffer + Dim*p.id )), 
-        m_normal(Eigen::Map< const VectorType >( p.nBuffer + Dim*p.id )), 
-        m_color (Eigen::Map< const VectorType >( p.colorBuffer + Dim*p.id ))
-    { }
-
-    // Required
-    inline const Eigen::Map< const VectorType >& pos()    const { return m_pos; }  
-
-    // Optional: could be used by point filters that require such attributes
-    inline const Eigen::Map< const VectorType >& normal() const { return m_normal; }
-    inline const Eigen::Map< const VectorType >& color()  const { return m_color; }
-};
-```
-
-As apperent in above example, to use your own point type, it is sufficient to implement a point adapter, and pass the type of the point adapter as the point type while instantiating any template class or method. OpenGR will wrap your point type with the adapter, and use the interface provided by the adapter for its computations.
-
 For convenience, OpenGR provides an implementation for gr::PointConcept: gr::Point3D. IO methods for gr::Point3D is also provided with the library to use the library on supported point cloud files without needing to implement the point concept and the IO methods. 
+
+Following examples show two simple point type classes demonstrating possible point types external to OpenGR, and the adapters for those point types that allow OpenGR to work on the instances of them without needing any duplication of data while complying with the required interface of the point type concept: gr::PointConcept.
+
+### Example: Using an external point type: `extlib1::PointType1`
+
+\anchor extlib1-pointtype
+\snippet ExtPointBinding/ext/point_extlib1.hpp extlib1::PointType1
+
+Assuming that we have an external point type `extlib1::PointType1` as defined above, 
+which is used by some library ExtLib1, it is sufficient to implement the below point
+adapter `extlib1::PointAdapter`, and pass the type of the point adapter as the point
+type while instantiating any template class or method of OpenGR. OpenGR will wrap
+your point type with the adapter, and use the interface provided by the adapter
+for its computations.
+
+\anchor extlib1-pointadapter
+\snippet ExtPointBinding/ext/pointadapter_extlib1.hpp extlib1::PointAdapter
+
+Note that some members of the point adapter `extlib1::PointAdapter` is not required
+by default, but could be useful when used with point filters that make use of those
+members. For example, the methods `normal()` and `color()` are handful for point
+filters that use normal and color attributes of points while comparing two points,
+such as gr::AdaptivePointFilter. 
+
+The `ExtPointBinding` demo demonstrates the external point binding through point
+adapters by using the above external point type `extlib1::PointType1` together
+with another external point type `extlib2::PointType2`.
+
+#### Registration using Super4PCS
+In this section, registration of points of an example external point type is briefly
+discussed by referring to the point adapter shown. This example is extracted from
+the demo `ExtPointBinding`, for which complete code could be found.
+
+Let's say we have two `std::vector` instances that contain two point clouds with
+point type \ref extlib1-pointtype "extlib1::PointType1", which we would like to compute a registration
+transform using Super4PCS algorithm:
+
+\snippet ExtPointBinding/external_point_binding_test.cc Creating a vector of extlib1::PointType1
+
+In such case, we need to use \ref extlib1-pointadapter "extlib1::PointAdapter" as our point type to allow
+OpenGR retrive the required attributes of our points of type \ref extlib1-pointtype "extlib1::PointType1"
+by wrapping them with \ref extlib1-pointadapter "extlib1::PointAdapter" on-the-fly. Therefore, the type of
+the adapter is used to instantiate the matcher type:
+\snippet ExtPointBinding/external_point_binding_test.cc Point adapter and matcher type
+
+Also, the sampler type is instantiated using the point adapter type as sampler needs
+to retrieve attributes of the point as well:
+\snippet ExtPointBinding/external_point_binding_test.cc Sampler type
+
+And, the rest for the registration transformation computation is as regular, instantiating
+the matcher and computing the registration transformation. Notice that the instances
+of the external point type are directly passed to the matcher, without requiring
+to make any type conversions:
+\snippet ExtPointBinding/external_point_binding_test.cc Matcher instantiation and computation
+
+### Example: Using another external point type: `extlib2::PointType2`
+\snippet ExtPointBinding/ext/point_extlib2.hpp extlib2::PointType2
+
+Here, a different external point type, `extlib2::PointType2`, is shown, for which
+the point binding to OpenGR could be done using the below adapter type, `extlib2::PointAdapter`,
+in an efficient manner thanks to Eigen maps.
+
+\snippet ExtPointBinding/ext/pointadapter_extlib2.hpp extlib2::PointAdapter
+
+For any external point type, when a proper point adapter is defined, which could
+be done with little effort in an efficient manner for most cases, OpenGR could be
+utilized as shown.

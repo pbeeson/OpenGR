@@ -263,9 +263,10 @@ int main(int argc, char **argv) {
        * containers of extlib1::PointType1 instances in hand to use as input to
        * gr registration methods.
        */
-      auto set1_point1 = getExtlib1Points(set1);
-      auto set2_point1 = getExtlib1Points(set2);
-
+//! [Creating a vector of extlib1::PointType1]
+      std::vector<extlib1::PointType1> set1_point1 = getExtlib1Points(set1);
+      std::vector<extlib1::PointType1> set2_point1 = getExtlib1Points(set2);
+//! [Creating a vector of extlib1::PointType1]
       using PointType    = extlib1::PointType1;
       /**
        * Here, extlib1::PointType1 is not a model of gr::PointConcept. Hence, an adapter
@@ -274,26 +275,29 @@ int main(int argc, char **argv) {
        * the adapter type will be passed, which it will use to wrap the extlib1::PointType1
        * instances on-the-fly to reach the information.
        */
+//! [Point adapter and matcher type]
       using PointAdapter = extlib1::PointAdapter;
-      using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS, PointAdapter,
-                                            TrVisitorType, gr::AdaptivePointFilter,
+      using MatcherType = gr::Match4pcsBase<gr::FunctorSuper4PCS,
+                                            PointAdapter, // here is the adapter!
+                                            TrVisitorType,
+                                            gr::AdaptivePointFilter,
                                             gr::AdaptivePointFilter::Options>;
+//! [Point adapter and matcher type]
       using OptionType  = typename MatcherType::OptionsType;
-
+//! [Sampler type]
       UniformDistSampler<PointAdapter> sampler;
-
+//! [Sampler type]
       OptionType options;
       if(! Demo::setOptionsFromArgs(options, logger))
         exit(-2); /// \FIXME use status codes for error reporting
 
+      logger.Log<Utils::Verbose>( "Starting registration" );
+//! [Matcher instantiation and computation]
       // Create a matcher instance
       MatcherType matcher (options, logger);
-
-      logger.Log<Utils::Verbose>( "Starting registration" );
-
       // Compute transformation: put transformation to mat, return registration score
       Scalar score = matcher.ComputeTransformation(set1_point1, set2_point1, mat, sampler, visitor);
-
+//! [Matcher instantiation and computation]
       logger.Log<Utils::Verbose>( "Score: ", score );
       logger.Log<Utils::Verbose>( "(Homogeneous) Transformation from ",
                               input2.c_str(),
@@ -317,8 +321,8 @@ int main(int argc, char **argv) {
        * containers of extlib2::PointType2 instances in hand to use as input to
        * gr registration methods.
        */
-      auto set1_point2 = getExtlib2Points(set1);
-      auto set2_point2 = getExtlib2Points(set2);
+      std::list<extlib2::PointType2> set1_point2 = getExtlib2Points(set1);
+      std::list<extlib2::PointType2> set2_point2 = getExtlib2Points(set2);
 
       using PointType    = extlib2::PointType2;
       /**

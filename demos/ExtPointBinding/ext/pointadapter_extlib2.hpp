@@ -5,6 +5,7 @@
 #include <Eigen/Core>
 #include "point_extlib2.hpp"
 
+//! [extlib2::PointAdapter]
 namespace extlib2
 {
 
@@ -32,5 +33,5 @@ struct PointAdapter {
 };
 
 }
-
+//! [extlib2::PointAdapter]
 #endif
