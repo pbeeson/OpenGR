@@ -23,11 +23,6 @@ set_target_properties(algo PROPERTIES
   INTERFACE_COMPILE_FEATURES cxx_std_17
 )
 
-if(OpenGR_USE_CHEALPIX)
-    include_directories(${Chealpix_INCLUDE_DIR})
-    add_dependencies(algo chealpix)
-endif(OpenGR_USE_CHEALPIX)
-
 set(targets_export_name "${PROJECT_NAME}Targets")
 install( TARGETS algo
     EXPORT "${targets_export_name}"
