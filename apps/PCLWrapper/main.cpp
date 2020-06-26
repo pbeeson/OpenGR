@@ -126,6 +126,10 @@ main (int argc, char **argv)
     pcl::visualization::PCLVisualizer visu("Alignment - Super4PCS");
     visu.addPointCloud (scene, ColorHandlerT (scene, 0.0, 255.0, 0.0), "scene");
     visu.addPointCloud (object_aligned, ColorHandlerT (object_aligned, 0.0, 0.0, 255.0), "object_aligned");
+
+    pcl::console::print_highlight ("Saving registered cloud to %s ...\n", Demo::defaultPlyOutput.c_str());
+    pcl::io::savePLYFileBinary<PointNT>(Demo::defaultPlyOutput, *object_aligned);
+
     visu.spin ();
   }
   else
