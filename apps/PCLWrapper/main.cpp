@@ -100,16 +100,6 @@ main (int argc, char **argv)
   pcl::Super4PCS<PointNT,PointNT> align;
   Demo::setOptionsFromArgs(align.options_);
 
-  // Downsample
-//  pcl::console::print_highlight ("Downsampling...\n");
-//  pcl::VoxelGrid<PointNT> grid;
-//  const float leaf = 0.005f;r
-//  grid.setLeafSize (leaf, leaf, leaf);
-//  grid.setInputCloud (object);
-//  grid.filter (*object);
-//  grid.setInputCloud (scene);
-//  grid.filter (*scene);
-
   // Perform alignment
   pcl::console::print_highlight ("Starting alignment...\n");
   align.setInputSource (object);
