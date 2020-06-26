@@ -12,7 +12,4 @@ set(Demo_ExtPointBinding_SRC
 add_executable(${PROJECT_NAME} ${Demo_ExtPointBinding_SRC})
 target_link_libraries(${PROJECT_NAME} gr::utils gr::accel gr::algo gr::io)
 add_dependencies(${PROJECT_NAME} opengr)
-if(OpenGR_USE_CHEALPIX)
-    target_link_libraries(${PROJECT_NAME} chealpix)
-endif(OpenGR_USE_CHEALPIX)
 install( TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin  )
