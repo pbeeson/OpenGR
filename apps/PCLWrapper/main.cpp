@@ -7,7 +7,12 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/io/obj_io.h>
 #include <pcl/io/ply_io.h>
+#include <pcl/io/pcd_io.h>
 #include <pcl/visualization/pcl_visualizer.h>
+
+#include <string>
+#include <functional> // std::function
+#include <map>
 
 #include <pcl/registration/super4pcs.h>
 
@@ -20,6 +25,43 @@ typedef pcl::PointCloud<PointNT> PointCloudT;
 typedef pcl::visualization::PointCloudColorHandlerCustom<PointNT> ColorHandlerT;
 
 using namespace gr;
+
+using loadfunc = std::function<int(const std::string &, pcl::PointCloud<PointNT> &)>;
+const std::map<std::string, loadfunc> loaders =
+{
+    { "obj", pcl::io::loadOBJFile<PointNT> },
+    { "ply", pcl::io::loadPLYFile<PointNT> },
+    { "pcd", pcl::io::loadPCDFile<PointNT> }
+};
+
+
+// src: https://en.cppreference.com/w/cpp/string/byte/tolower
+std::string str_tolower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char c){ return std::tolower(c); } // correct
+                  );
+    return s;
+}
+
+bool
+load(const std::string& filename, PointCloudT::Ptr& pcloud){
+    auto getFileExt = [] (const std::string& s) -> std::string {
+
+       size_t i = s.rfind('.', s.length());
+       return i != std::string::npos
+                 ? str_tolower( s.substr(i+1, s.length() - i) )
+                 : "";
+    };
+
+    std::string ext = getFileExt(filename);
+    auto l = loaders.find(ext);
+    if( l != loaders.end() ) {
+        return (*l).second( filename, *pcloud ) >= 0;
+    }
+    pcl::console::print_error ("Unsupported file extension: %s\n", ext.c_str());
+    return false;
+}
+
 
 // Align a rigid object to a scene with clutter and occlusions
 int
@@ -38,10 +80,12 @@ main (int argc, char **argv)
     return (-1);
   }
 
+  std::string objPath {argv[2]};
+  std::string scenePath {argv[1]};
+
   // Load object and scene
   pcl::console::print_highlight ("Loading point clouds...\n");
-  if (pcl::io::loadOBJFile<PointNT> (argv[2], *object) < 0 ||
-      pcl::io::loadOBJFile<PointNT> (argv[1], *scene) < 0)
+  if ( ! ( load(objPath, object) && load(scenePath, scene) ) )
   {
     pcl::console::print_error ("Error loading object/scene file!\n");
     return (-1);
@@ -55,16 +99,6 @@ main (int argc, char **argv)
 
   pcl::Super4PCS<PointNT,PointNT> align;
   Demo::setOptionsFromArgs(align.options_);
-
-  // Downsample
-//  pcl::console::print_highlight ("Downsampling...\n");
-//  pcl::VoxelGrid<PointNT> grid;
-//  const float leaf = 0.005f;r
-//  grid.setLeafSize (leaf, leaf, leaf);
-//  grid.setInputCloud (object);
-//  grid.filter (*object);
-//  grid.setInputCloud (scene);
-//  grid.filter (*scene);
 
   // Perform alignment
   pcl::console::print_highlight ("Starting alignment...\n");
@@ -92,6 +126,10 @@ main (int argc, char **argv)
     pcl::visualization::PCLVisualizer visu("Alignment - Super4PCS");
     visu.addPointCloud (scene, ColorHandlerT (scene, 0.0, 255.0, 0.0), "scene");
     visu.addPointCloud (object_aligned, ColorHandlerT (object_aligned, 0.0, 0.0, 255.0), "object_aligned");
+
+    pcl::console::print_highlight ("Saving registered cloud to %s ...\n", Demo::defaultPlyOutput.c_str());
+    pcl::io::savePLYFileBinary<PointNT>(Demo::defaultPlyOutput, *object_aligned);
+
     visu.spin ();
   }
   else
