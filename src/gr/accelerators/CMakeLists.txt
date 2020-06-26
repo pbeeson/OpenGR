@@ -40,6 +40,7 @@ set_target_properties(accel PROPERTIES
 
 if(OpenGR_USE_CHEALPIX)
     add_dependencies(accel chealpix)
+    target_link_libraries(accel INTERFACE chealpix)
 endif(OpenGR_USE_CHEALPIX)
 
 set(targets_export_name "${PROJECT_NAME}Targets")
