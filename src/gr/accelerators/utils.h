@@ -197,7 +197,7 @@ struct OneRingNeighborhood {
     ///         on the grid boundaries, out of bounds cells ids are marked
     ///         with -1 in the output array.
     template <int dim>
-    void get(
+    inline void get(
         int queryId,
         int nElPerDim,
         typename NeighborhoodType<dim>::type& nei) {
@@ -206,7 +206,7 @@ struct OneRingNeighborhood {
 
 private:
     template <int dim>
-    void get(
+    inline void get(
         int /*queryId*/,
         int /*nElPerDim*/,
         int /*offset*/,
