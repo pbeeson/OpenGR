@@ -144,8 +144,10 @@ endif(OpenGR_USE_CHEALPIX)
 ################################################################################
 
 if(OpenGR_COMPILE_TESTS)
-        include(cmake/ConfigureTesting.cmake)
-        add_subdirectory(tests EXCLUDE_FROM_ALL)
+    include(CTest)
+    set (BUILD_TESTING ON)
+    add_custom_target(buildtests)
+    add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif(OpenGR_COMPILE_TESTS)
 
 include(cmake/AssetsAndScripts.cmake)
