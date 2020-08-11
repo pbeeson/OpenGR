@@ -6,8 +6,8 @@
 #define OPENGR_MATCH3PCSBASE_H
 
 #include <vector>
-#include "gr/shared.h"
-#include "gr/sampling.h"
+#include "gr/utils/shared.h"
+#include "gr/utils/sampling.h"
 #include "gr/algorithms/congruentSetExplorationBase.h"
 #include "matchBase.h"
 

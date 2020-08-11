@@ -12,13 +12,9 @@
 #endif
 
 #include "gr/algorithms/matchBase.h"
-#include "gr/shared.h"
-#include "gr/sampling.h"
-#include "gr/accelerators/kdtree.h"
-#include "gr/utils/logger.h"
 
 #ifdef TEST_GLOBAL_TIMINGS
-#   include "../utils/timer.h"
+#   include "gr/utils/timer.h"
 #endif
 
 

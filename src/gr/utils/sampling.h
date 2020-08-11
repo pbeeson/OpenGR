@@ -53,7 +53,7 @@
 
 #include <vector>
 #include <array>
-#include "gr/shared.h"
+#include <gr/utils/shared.h>
 
 namespace gr {
 

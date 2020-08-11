@@ -48,8 +48,8 @@
 #ifndef _OPENGR_ACCELERATORS_INDEXED_NORMAL_HEAL_SET_H_
 #define _OPENGR_ACCELERATORS_INDEXED_NORMAL_HEAL_SET_H_
 
-#include "../utils/disablewarnings.h"
-#include "../accelerators/utils.h"
+#include "gr/utils/disablewarnings.h"
+#include "gr/accelerators/utils.h"
 #include "chealpix.h"
 #include <Eigen/Core>
 

@@ -5,7 +5,7 @@
 #ifndef __POINT_CONVERSION_H__
 #define __POINT_CONVERSION_H__
 
-#include <gr/shared.h>
+#include <gr/utils/shared.h>
 
 #include "point_extlib1.hpp"
 #include "point_extlib2.hpp"

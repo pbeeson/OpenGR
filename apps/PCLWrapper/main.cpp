@@ -16,7 +16,7 @@
 
 #include <pcl/registration/super4pcs.h>
 
-#include <gr/shared.h>
+#include <gr/utils/shared.h>
 #include "../demo-utils.h"
 
 // Types

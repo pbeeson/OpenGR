@@ -58,7 +58,7 @@
 #include "gr/accelerators/pairExtraction/intersectionPrimitive.h"
 #include "gr/utils/timer.h"
 #include "gr/algorithms/PointPairFilter.h"
-#include "gr/sampling.h"
+#include "gr/utils/sampling.h"
 
 #include <Eigen/Dense>
 

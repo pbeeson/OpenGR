@@ -5,7 +5,7 @@
 #ifndef OPENGR_FUNCTORFEATUREPOINTTEST_H
 #define OPENGR_FUNCTORFEATUREPOINTTEST_H
 
-#include <gr/shared.h>
+#include "gr/utils/shared.h"
 #include <vector>
 
 namespace gr {

@@ -3,7 +3,7 @@
 #define BRUTE4PCS_FUNCTOR4PCS_H
 
 #include <vector>
-#include "gr/shared.h"
+#include "gr/utils/shared.h"
 #include "gr/algorithms/match4pcsBase.h"
 
 

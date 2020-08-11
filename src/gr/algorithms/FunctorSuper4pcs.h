@@ -7,7 +7,7 @@
 
 
 #include <vector>
-#include "gr/shared.h"
+#include "gr/utils/shared.h"
 #include "gr/algorithms/pairCreationFunctor.h"
 
 #ifdef SUPER4PCS_USE_CHEALPIX

@@ -6,7 +6,7 @@
 #define OPENGR_FUNCTOR4PCS_H
 
 #include <vector>
-#include "gr/shared.h"
+#include "gr/utils/shared.h"
 
 
 namespace gr {

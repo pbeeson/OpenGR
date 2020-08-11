@@ -1,7 +1,7 @@
 #ifndef _OPENGR_IO_IO_H
 #define _OPENGR_IO_IO_H
 
-#include "gr/shared.h"
+#include "gr/utils/shared.h"
 #include "gr/utils/disablewarnings.h"
 
 #include <fstream>

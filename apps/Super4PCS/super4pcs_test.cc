@@ -1,6 +1,6 @@
 #include "gr/io/io.h"
 #include "gr/utils/geometry.h"
-#include "gr/sampling.h"
+#include "gr/utils/sampling.h"
 #include "gr/algorithms/match4pcsBase.h"
 #include "gr/algorithms/Functor4pcs.h"
 #include "gr/algorithms/FunctorSuper4pcs.h"

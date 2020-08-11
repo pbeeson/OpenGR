@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <vector>
-#include "gr/shared.h"
+#include "gr/utils/shared.h"
 
 #include "gr/accelerators/pairExtraction/bruteForceFunctor.h"
 #include "gr/accelerators/pairExtraction/intersectionFunctor.h"

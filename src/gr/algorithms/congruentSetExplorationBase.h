@@ -50,7 +50,7 @@
 #include <omp.h>
 #endif
 
-#include "gr/shared.h"
+#include "gr/utils/shared.h"
 #include "gr/algorithms/matchBase.h"
 
 #ifdef TEST_GLOBAL_TIMINGS

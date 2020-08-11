@@ -14,10 +14,10 @@
 #include <omp.h>
 #endif
 
-#include "../shared.h"
-#include "../sampling.h"
-#include "../accelerators/kdtree.h"
-#include "../utils/logger.h"
+#include "gr/utils/sampling.h"
+#include "gr/utils/shared.h"
+#include "gr/utils/logger.h"
+#include "gr/accelerators/kdtree.h"
 #include "match4pcsBase.h"
 
 #ifdef TEST_GLOBAL_TIMINGS

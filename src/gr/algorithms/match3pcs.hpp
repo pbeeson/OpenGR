@@ -5,8 +5,8 @@
 #include <vector>
 #include <atomic>
 #include <chrono>
-#include "gr/shared.h"
-#include "gr/sampling.h"
+#include "gr/utils/shared.h"
+#include "gr/utils/sampling.h"
 #include "gr/utils/logger.h"
 #include "match3pcs.h"
 

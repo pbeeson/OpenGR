@@ -44,8 +44,8 @@
 #include <pcl/registration/registration.h>
 #include <pcl/registration/transformation_estimation_svd.h>
 
-#include <gr/shared.h>
-#include <gr/sampling.h>
+#include <gr/utils/shared.h>
+#include <gr/utils/sampling.h>
 #include <gr/utils/logger.h>
 #include <gr/algorithms/PointPairFilter.h>
 #include <gr/algorithms/match4pcsBase.h>
