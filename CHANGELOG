@@ -8,6 +8,7 @@ On-going
     - testing: simplify ctest configuration https://github.com/STORM-IRIT/OpenGR/pull/60
 
  - fixes
+    - Fix long-standing bug causing unexpected deformation of the registered point clouds https://github.com/STORM-IRIT/OpenGR/issues/9
     - Fix potential compilation error with compilers partially supporting cxx17 (gcc 4.9.2) https://github.com/STORM-IRIT/OpenGR/pull/66
     - Fix fitness score assignment in PCL wrapper https://github.com/STORM-IRIT/OpenGR/pull/65
     - update cmake minimal version (fixes #61) https://github.com/STORM-IRIT/OpenGR/pull/62
