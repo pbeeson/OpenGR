@@ -180,7 +180,7 @@ class Point3D
 //        Scalar overlap_estimation = 0.2;
 //    };
 
-} /// namespace Super4PCS
+} /// namespace gr
 
 
 

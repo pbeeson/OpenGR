@@ -80,6 +80,6 @@ private:
 };
 
 } // namespace Utils
-} // namespace Super4PCS
+} // namespace gr
 
 #endif // _TIMER_H_

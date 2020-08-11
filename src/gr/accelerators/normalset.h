@@ -175,7 +175,7 @@ public:
                             bool tryReverse = false);
 };
 
-} // namespace Super4PCS
+} // namespace gr
 
 #include "gr/accelerators/normalset.hpp"
 

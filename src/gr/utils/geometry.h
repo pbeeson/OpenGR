@@ -94,6 +94,6 @@ static inline void TransformPointCloud( PointContainer& v,
 }
 
 } // namespace Utils
-} // namespace Super4PCS
+} // namespace gr
 
 #endif // _UTILS_GEOMETRY_H_

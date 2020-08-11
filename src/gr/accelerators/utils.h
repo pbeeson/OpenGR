@@ -293,7 +293,7 @@ OneRingNeighborhood::get<3> (
 
 
 } //namespace gr::Utils
-} //namespace Super4PCS
+} //namespace gr
 
 
 #endif

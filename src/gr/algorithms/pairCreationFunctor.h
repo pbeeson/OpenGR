@@ -168,6 +168,6 @@ public:
   }
 };
 
-} // namespace Super4PCS
+} // namespace gr
 
 #endif // PAIRCREATIONFUNCTOR_H

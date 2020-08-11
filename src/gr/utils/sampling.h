@@ -140,7 +140,7 @@ private:
 };
 
 
-} // namespace Super4PCS
+} // namespace gr
 
 
 #endif

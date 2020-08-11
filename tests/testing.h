@@ -294,6 +294,6 @@ static bool init_testing(int argc, const char *argv[])
 }
 
 } // namespace Testing
-} // namespace Super4PCS
+} // namespace gr
 
 #endif // _OPENGR_TESTING_H_

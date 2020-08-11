@@ -217,7 +217,7 @@ protected :
     Scalar Verify(const Eigen::Ref<const MatrixType> & mat) const;
 
 }; /// class MatchBaseType
-} /// namespace Super4PCS
+} /// namespace gr
 #include "congruentSetExplorationBase.hpp"
 
 #endif // _OPENGR_ALGO_CSE_

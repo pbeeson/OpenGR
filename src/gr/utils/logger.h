@@ -118,7 +118,7 @@ protected:
     }
 }; // class Logger
 } // namespace Utils
-} // namespace Super4PCS
+} // namespace gr
 
 
 #endif // LOGGER_H

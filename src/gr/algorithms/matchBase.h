@@ -272,7 +272,7 @@ private:
     void initKdTree();
 
 }; /// class MatchBase
-} /// namespace Super4PCS
+} /// namespace gr
 #include "matchBase.hpp"
 
 #endif // _OPENGR_ALGO_MATCH_BASE_
