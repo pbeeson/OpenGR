@@ -15,7 +15,7 @@ namespace gr {
     template <typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::
     Match3pcs(const Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::OptionsType &options,
                          const gr::Utils::Logger &logger)
@@ -26,13 +26,13 @@ namespace gr {
     template <typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::~Match3pcs() {}
 
     template <typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     bool Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (CongruentBaseType &base, Set& congruent_set) {
 
         //Find base in P (random triangle)
@@ -91,7 +91,7 @@ namespace gr {
     template <typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     bool Match3pcs<PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base)
     {
         if (!MatchBaseType::SelectRandomTriangle(MatchBaseType::max_base_diameter_, base[0], base[1], base[2]))

@@ -70,7 +70,7 @@ struct DummyTransformVisitor {
 
 /// \brief Abstract class for registration algorithms
 template <typename PointType, typename _TransformVisitor = DummyTransformVisitor,
-          template < class, class > typename ... OptExts>
+          template < class, class > class ... OptExts>
 class MatchBase {
 
 public:
@@ -262,7 +262,7 @@ protected :
     /// @param P The first input set.
     /// @param Q The second input set.
     /// @param sampler The sampler used to sample the input sets.
-    template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
+    template <typename InputRange1, typename InputRange2, template<typename> class Sampler>
     void init(const InputRange1& P,
               const InputRange2& Q,
               const Sampler<PointType>& sampler);

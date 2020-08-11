@@ -26,11 +26,11 @@
 
 
 namespace gr {
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Match4pcsBase (const OptionsType& options
             , const Utils::Logger& logger)
             : MatchBaseType(options,logger)
@@ -38,18 +38,18 @@ namespace gr {
     {
     }
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::~Match4pcsBase() {}
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::TryQuadrilateral(
         typename PointType::Scalar &invariant1,
         typename PointType::Scalar &invariant2,
@@ -103,11 +103,11 @@ namespace gr {
         return true;
     }
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::SelectQuadrilateral(
         Scalar &invariant1,
         Scalar &invariant2,
@@ -183,22 +183,22 @@ namespace gr {
         return false;
     }
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     // Initialize all internal data structures and data members.
     void Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Initialize() {
         fun_.Initialize();
     }
 
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::generateCongruents (
         CongruentBaseType &base, Set& congruent_quads) {
 //      std::cout << "------------------" << std::endl;
@@ -247,11 +247,11 @@ namespace gr {
         return true;
     }
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base)
     {
         Scalar invariant1, invariant2; // dummy
@@ -259,11 +259,11 @@ namespace gr {
         return initBase(base, invariant1, invariant2);
     }
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     bool Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::initBase (CongruentBaseType &base, Scalar& invariant1, Scalar& invariant2)
     {
         #ifdef STATIC_BASE
@@ -298,11 +298,11 @@ namespace gr {
     }
 
 
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename PointType,
               typename TransformVisitor,
               typename PairFilteringFunctor,
-              template < class, class > typename PFO>
+              template < class, class > class PFO>
     typename Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::Scalar
     Match4pcsBase<_Functor, PointType, TransformVisitor, PairFilteringFunctor, PFO>::distSegmentToSegment(
         const VectorType& p1, const VectorType& p2,
