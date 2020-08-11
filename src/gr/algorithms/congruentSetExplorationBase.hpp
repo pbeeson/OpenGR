@@ -56,7 +56,7 @@ CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFu
 template <typename Traits, typename PointType, typename TransformVisitor,
           typename PairFilteringFunctor,
           template < class, class > class ... OptExts >
-template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
+template <typename InputRange1, typename InputRange2, template<typename> class Sampler>
 typename CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::Scalar
 CongruentSetExplorationBase<Traits, PointType, TransformVisitor, PairFilteringFunctor, OptExts ...>::ComputeTransformation(
         const InputRange1& P,

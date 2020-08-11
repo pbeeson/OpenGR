@@ -27,7 +27,7 @@
 
 namespace gr {
 
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > class ... OptExts>
 MATCH_BASE_TYPE::MatchBase(const typename MATCH_BASE_TYPE::OptionsType &options,
                       const Utils::Logger& logger
                        )
@@ -36,11 +36,11 @@ MATCH_BASE_TYPE::MatchBase(const typename MATCH_BASE_TYPE::OptionsType &options,
     , options_(options)
 {}
 
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > class ... OptExts>
 MATCH_BASE_TYPE::~MatchBase(){}
 
 
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > class ... OptExts>
 typename MATCH_BASE_TYPE::Scalar
 MATCH_BASE_TYPE::MeanDistance() const {
     const Scalar kDiameterFraction = 0.2;
@@ -66,7 +66,7 @@ MATCH_BASE_TYPE::MeanDistance() const {
     return distance / number_of_samples;
 }
 
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > class ... OptExts>
 bool
 MATCH_BASE_TYPE::SelectRandomTriangle(Scalar max_base_diameter, int &base1, int &base2, int &base3) {
     int number_of_points = sampled_P_3D_.size();
@@ -104,7 +104,7 @@ MATCH_BASE_TYPE::SelectRandomTriangle(Scalar max_base_diameter, int &base1, int 
     return base1 != -1 && base2 != -1 && base3 != -1;
 }
 
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > class ... OptExts>
 void
 MATCH_BASE_TYPE::initKdTree(){
     size_t number_of_points = sampled_P_3D_.size();
@@ -119,7 +119,7 @@ MATCH_BASE_TYPE::initKdTree(){
 }
 
 
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
+template <typename PointType, typename TransformVisitor, template < class, class > class ... OptExts>
 template <typename Coordinates>
 bool
 MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
@@ -256,8 +256,8 @@ MATCH_BASE_TYPE::ComputeRigidTransformation(const Coordinates& ref,
     return true;
 }
 
-template <typename PointType, typename TransformVisitor, template < class, class > typename ... OptExts>
-template <typename InputRange1, typename InputRange2, template<typename> typename Sampler>
+template <typename PointType, typename TransformVisitor, template < class, class > class ... OptExts>
+template <typename InputRange1, typename InputRange2, template<typename> class Sampler>
 void MATCH_BASE_TYPE::init(const InputRange1& P,
               const InputRange2& Q,
               const Sampler<PointType>& sampler) {

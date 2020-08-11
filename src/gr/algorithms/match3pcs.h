@@ -28,7 +28,7 @@ namespace gr {
     template <typename _PointType,
               typename _TransformVisitor,
               typename _PairFilteringFunctor,  /// <\brief Must implements PairFilterConcept
-              template < class, class > typename PairFilteringOptions >
+              template < class, class > class PairFilteringOptions >
     class Match3pcs : public CongruentSetExplorationBase<Traits3pcs<typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
     public:
       using PosMutablePoint      = typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint;

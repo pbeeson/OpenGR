@@ -32,11 +32,11 @@ namespace gr {
 
     /// Class for the computation of the 4PCS algorithm.
     /// \param Functor use to determinate the use of Super4pcs or 4pcs algorithm.
-    template <template <typename, typename, typename> typename _Functor,
+    template <template <typename, typename, typename> class _Functor,
               typename _PointType,
               typename _TransformVisitor,
               typename _PairFilteringFunctor,  /// <\brief Must implements PairFilterConcept
-              template < class, class > typename PairFilteringOptions >
+              template < class, class > class PairFilteringOptions >
     class Match4pcsBase : public CongruentSetExplorationBase<Traits4pcs<typename MatchBase<_PointType, _TransformVisitor, PairFilteringOptions, CongruentSetExplorationOptions>::PosMutablePoint>, _PointType, _TransformVisitor, _PairFilteringFunctor, PairFilteringOptions> {
     public:
         using Scalar            = typename _PointType::Scalar;
