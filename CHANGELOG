@@ -1,3 +1,39 @@
+On-going
+========
+ - improvements
+    - Chealpix: when enabled, export chealpix in cmake packages https://github.com/STORM-IRIT/OpenGR/pull/52
+    - PCLWrapper:
+       - improve IO (now load obj, pcd and ply files) https://github.com/STORM-IRIT/OpenGR/pull/54
+       - add getter/setters for algorithm options https://github.com/STORM-IRIT/OpenGR/pull/56
+    - testing: simplify ctest configuration https://github.com/STORM-IRIT/OpenGR/pull/60
+
+ - fixes
+    - Fix potential compilation error with compilers partially supporting cxx17 (gcc 4.9.2) https://github.com/STORM-IRIT/OpenGR/pull/66
+    - Fix fitness score assignment in PCL wrapper https://github.com/STORM-IRIT/OpenGR/pull/65
+    - update cmake minimal version (fixes #61) https://github.com/STORM-IRIT/OpenGR/pull/62
+    - issue #58 (Linking errors for header only libraries) https://github.com/STORM-IRIT/OpenGR/pull/59
+    - compilation error with MSVC https://github.com/STORM-IRIT/OpenGR/pull/52
+    - compilation error on some compilers https://github.com/STORM-IRIT/OpenGR/pull/48
+    - compilation warnings https://github.com/STORM-IRIT/OpenGR/pull/46
+
+
+OpenGR-v1.2.0
+=============
+ - improve API
+     - implement congruent point algorithms using functors https://github.com/STORM-IRIT/OpenGR/pull/13
+     - add point-type abstraction layer (Google Summer of Code 2019) https://github.com/STORM-IRIT/OpenGR/pull/31
+ - simplify build chain
+     - switch library to header-only https://github.com/STORM-IRIT/OpenGR/pull/40
+     - improve cmake package (export targets in gr namespace) https://github.com/STORM-IRIT/OpenGR/pull/40
+     - add cmake package for buil dir https://github.com/STORM-IRIT/OpenGR/pull/15
+ - improve demos
+ - bug fixes:
+     - https://github.com/STORM-IRIT/OpenGR/issues/34
+
+
+
+----------------------------------------------------------------------------------------------------
+CHANGELOG OF THE OLD FORK: SUPER4PCS
 Super4PCS-v1.2.0
 ======================
 ### Purpose of this release
