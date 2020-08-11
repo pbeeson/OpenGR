@@ -63,6 +63,7 @@ This library is based on [Super4PCS library](https://github.com/nmellado/Super4P
 * [Simone Gasparini](https://github.com/simogasp) Pull-Request reviews
 * [Kastan Day](https://github.com/kastanday) Added getFitnessScore() to PCL wrapper (#10)
 * [xinkang](https://github.com/xinkang) Fix include path of timer.h
+* [Patrick Beeson] (https://github.com/pbeeson) Fix composition of rotation matrix (#68)
 
 We also wish to thanks Simon Giraudot and https://geometryfactory.com/ for their support and help through our participation to
  - the 2019 Google Summer of Code: https://summerofcode.withgoogle.com/projects/#6321265885839360,
