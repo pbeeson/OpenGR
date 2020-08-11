@@ -47,16 +47,26 @@ In a nutshell, it provides:
 
 ## Credits
 * Nicolas Mellado: main developper, conception, implementation and examples
+
+This library is based on [Super4PCS library](https://github.com/nmellado/Super4PCS), which was also developped by:
 * Dror Aiger: 4pcs implementation
 * Niloy Mitra: 4pcs implementation
 
-### Contributors
+### Contributors and support
+(With pull request ids if any)
+* [Lorenz Bung](https://github.com/LorenzBung) Improve PCL wrapper (#56, #65)
+* [Alessandro Muntoni](https://github.com/alemuntoni) Fix compilation on windows (#52)
+* [Simon Giraudot](https://github.com/sgiraudot) Code cleaning (#46)
+* [Necip Fazil Yildiran](https://github.com/necipfazil) Range and point type abstraction layer (#31)
+* [Sebastien Loriot](https://github.com/sloriot) Fix cmake package (#15)
+* [Sandra Alfaro](https://github.com/SandraAlfaro) Implement congruent point algorithms using functors (#13)
 * [Simone Gasparini](https://github.com/simogasp) Pull-Request reviews
+* [Kastan Day](https://github.com/kastanday) Added getFitnessScore() to PCL wrapper (#10)
 * [xinkang](https://github.com/xinkang) Fix include path of timer.h
-* [Kastan Day](https://github.com/kastanday) Added getFitnessScore() to PCL wrapper
-* [Necip Fazil Yildiran](https://github.com/necipfazil) Range and point type abstraction layer
 
-We also wish to thanks Simon Giraudot and https://geometryfactory.com/ for their support and help through our participation to the 2019 Google Summer of Code: https://summerofcode.withgoogle.com/projects/#6321265885839360.
+We also wish to thanks Simon Giraudot and https://geometryfactory.com/ for their support and help through our participation to
+ - the 2019 Google Summer of Code: https://summerofcode.withgoogle.com/projects/#6321265885839360,
+ - the 2020 Google Summer of Code: https://summerofcode.withgoogle.com/projects/#5673656849530880
 
 
 ### Citation
